@@ -4,11 +4,59 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var Cookies = require( "cookies" )
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+var port = 4848;
+process.env.DEBUG = true
+var callbackUrl = 'http://localhost:'+port+'/callback'
+
+var oauth2 = require('simple-oauth2')({
+  clientID: "ZnVY2G0fN-ZzL0-XBi7L_g",
+  clientSecret: "4OdDfW36ONBQug4Y2_3lDw",
+  site: 'https://api.sandbox.freeagent.com/v2',
+  authorizationPath: '/approve_app',
+  tokenPath: '/token_endpoint',
+});
+
+// Authorization uri definition
+var authorization_uri = oauth2.authCode.authorizeURL({
+  redirect_uri: callbackUrl,
+  scope: 'notifications',
+  state: '0'
+});
+
+// Initial page redirecting to FreeAgent
+app.get('/auth', function (req, res) {
+    res.redirect(authorization_uri);
+});
+
+// Callback service parsing the authorization token and asking for the access token
+app.get('/callback', function (req, res) {
+  var code = req.query.code;
+  console.log('/callback');
+  console.log(code);
+
+  oauth2.authCode.getToken({
+    code: code,
+    redirect_uri: callbackUrl
+  }, saveToken);
+
+  function saveToken(error, result) {
+    if (error) { console.log('Access Token Error', error); res.send("Failed"); return; }
+    console.log(result)
+    token = oauth2.accessToken.create(result);
+    console.log(token)
+    res.cookie('access_token', token.token.access_token, { maxAge: 3600000, path: '/' });
+    res.cookie('refresh_token', token.token.refresh_token, { maxAge: 3600000, path: '/' });
+    res.send('passed')
+  }
+
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -57,7 +105,7 @@ app.use(function(err, req, res, next) {
     });
 });
 
-app.listen(4848)
-console.log("App listening on port 4848")
+app.listen(port)
+console.log("App listening on port "+port)
 
 module.exports = app;
