@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  div(ng-controller='MainCtrl')
+    h1 {{monthName}}
+    h2 Now: {{today}}
+
+    table(border="1", style="width: 100%")
+      thead
+        tr
+          th Mon
+          th Tue
+          th Wed
+          th Thu
+          th Fri
+          th Sat
+          th Sun
+      tbody
+        tr(ng-repeat="week in weeks")
+          td(ng-repeat="day in week")
+            table
+              tr: td {{day}}
+              tr: td 1h
+             x
+    p Welcome to #{title}
+
+    script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js")
+    script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.js")
+
+
+    script(src="/app/fatt-app.js")

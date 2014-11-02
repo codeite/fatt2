@@ -13,7 +13,7 @@ angular.module('fatt',[])
 
 
     var weeks = []
-    while (currentDay.month() <= month.month()) {
+    for(var weekIndex=0; weekIndex<6; weekIndex++) {
       var week = []
       for (var i=0; i<7; i++) {
         week.push(currentDay.date())
