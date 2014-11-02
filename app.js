@@ -5,11 +5,15 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var Cookies = require( "cookies" )
+var cookieParser = require('cookie-parser')
+var request = require('request');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
 
 var app = express();
+
+app.use(cookieParser())
 
 var port = 4848;
 process.env.DEBUG = true
@@ -56,6 +60,43 @@ app.get('/callback', function (req, res) {
     res.send('passed')
   }
 
+});
+
+app.get('/api/freeagent/*', function(req, res) {
+  var path = req.path.substr('/api/freeagent'.length);
+  var query = req.query;
+  var url = 'https://api.sandbox.freeagent.com/v2'+path
+
+  if(query) {
+    url += '?'
+
+    for(var i in query) {
+      url += (i + "=" + query[i] + "&")
+    }
+
+  }
+
+  console.log("GET: "+url)
+
+  var authToken = req.cookies.access_token
+
+  console.log("Auth: "+authToken)
+  request.get(
+    url,
+    {
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'node.js',
+        'Authorization': 'Bearer '+authToken
+      }
+    },
+    function (error, response, body) {
+        //if (!error && response.statusCode == 200) {
+            console.log('body', body)
+        //}
+        res.send(response.body);
+    }
+);
 });
 
 // view engine setup

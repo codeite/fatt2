@@ -19,8 +19,8 @@ block content
         tr(ng-repeat="week in weeks")
           td(ng-repeat="day in week")
             table
-              tr: td {{day}}
-              tr: td 1h
+              tr: td {{day.day}}
+              tr: td {{day.hours}}h
              x
     p Welcome to #{title}
 
