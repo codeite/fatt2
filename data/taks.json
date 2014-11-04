@@ -1,0 +1,15 @@
+{
+  "tasks": [
+    {
+      "status": "Active",
+      "billing_period": "hour",
+      "name": "work",
+      "url": "https://api.sandbox.freeagent.com/v2/tasks/269",
+      "created_at": "2014-11-02T09:26:39Z",
+      "updated_at": "2014-11-02T09:26:39Z",
+      "billing_rate": "5.0",
+      "project": "https://api.sandbox.freeagent.com/v2/projects/2682",
+      "is_billable": true
+    }
+  ]
+}

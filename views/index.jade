@@ -17,15 +17,26 @@ block content
           th Sun
       tbody
         tr(ng-repeat="week in weeks")
-          td(ng-repeat="day in week")
-            table
-              tr: td {{day.day}}
-              tr: td {{day.hours}}h
-             x
+          td(ng-repeat="day in week" valign="top")
+            table(style="width: 100%" border="0")
+              tr
+                td {{day.day}}
+                td(align="right")
+                  a(ng-click="day.add()") Add
+              tr
+                td Total:
+                td {{day.total}}h
+              tr(ng-repeat="record in day.records")
+                td: div(title="{{record.contactName}}: {{record.projectName}}") {{record.taskName}}:
+                td {{record.hours}}h
+
     p Welcome to #{title}
 
     script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js")
+    script window.angular || document.write('<script src="/javascripts/angular.js">\x3C/script>')
+
     script(src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.3/moment.js")
+    script window.moment || document.write('<script src="/javascripts/moment.js">\x3C/script>')
 
 
     script(src="/app/fatt-app.js")

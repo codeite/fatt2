@@ -1,0 +1,20 @@
+{
+  "projects": [
+    {
+      "status": "Active",
+      "billing_period": "hour",
+      "budget_units": "Hours",
+      "name": "Work",
+      "currency": "GBP",
+      "url": "https://api.sandbox.freeagent.com/v2/projects/2682",
+      "created_at": "2014-11-02T09:25:39Z",
+      "budget": 0,
+      "updated_at": "2014-11-02T09:25:39Z",
+      "is_ir35": false,
+      "contact": "https://api.sandbox.freeagent.com/v2/contacts/27525",
+      "normal_billing_rate": "5.0",
+      "uses_project_invoice_sequence": false,
+      "hours_per_day": "8.0"
+    }
+  ]
+}

@@ -8,8 +8,10 @@ var Cookies = require( "cookies" )
 var cookieParser = require('cookie-parser')
 var request = require('request');
 
+
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var freeagentRoutes = require('./routes/freeagentRoutes');
 
 var app = express();
 
@@ -62,42 +64,6 @@ app.get('/callback', function (req, res) {
 
 });
 
-app.get('/api/freeagent/*', function(req, res) {
-  var path = req.path.substr('/api/freeagent'.length);
-  var query = req.query;
-  var url = 'https://api.sandbox.freeagent.com/v2'+path
-
-  if(query) {
-    url += '?'
-
-    for(var i in query) {
-      url += (i + "=" + query[i] + "&")
-    }
-
-  }
-
-  console.log("GET: "+url)
-
-  var authToken = req.cookies.access_token
-
-  console.log("Auth: "+authToken)
-  request.get(
-    url,
-    {
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'node.js',
-        'Authorization': 'Bearer '+authToken
-      }
-    },
-    function (error, response, body) {
-        //if (!error && response.statusCode == 200) {
-            console.log('body', body)
-        //}
-        res.send(response.body);
-    }
-);
-});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -114,6 +80,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/users', users);
+app.use('/freeagent', freeagentRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
