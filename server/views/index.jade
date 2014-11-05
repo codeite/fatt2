@@ -3,8 +3,9 @@ extends layout
 block content
   div(ng-controller='MainCtrl')
     h1 {{monthName}}
-    h2 Now: {{today}}
+    h2 Logged in as : {{me.first_name}} {{me.last_name}}
     
+
     a(href='/auth') Login
     table.table.table-bordered(style="width: 100%")
       thead
@@ -23,7 +24,14 @@ block content
               tr
                 td {{day.day}}
                 td(align="right")
-                  a(ng-click="day.add()") Add +
+                  .btn-group.btn-group-xs(dropdown='dropdown')
+                    button.btn.dropdown-toggle(type='button')
+                      | Add
+                      span.caret
+                    ul.dropdown-menu(role='menu')
+                      li(ng-repeat="record in commonRecords | orderBy:'useCount':true")
+                        a(ng-click="day.add(this.record)") {{record.hours}}h:{{record.taskName}}
+
               tr
                 td Total:
                 td {{day.total}}h
@@ -31,8 +39,6 @@ block content
                 td: div(title="{{record.contactName}}: {{record.projectName}}") {{record.taskName}}:
                 td {{record.hours}}h
 
-    modal-dialog(show='modalShown' width='500px' height='50%')
-      p I am content
 
     script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js")
     script window.angular || document.write('<script src="/javascripts/angular.js">\x3C/script>')
@@ -41,4 +47,5 @@ block content
     script window.moment || document.write('<script src="/javascripts/moment.js">\x3C/script>')
 
 
+    script(src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap.js")
     script(src="/app/fatt-app.js")

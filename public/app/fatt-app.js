@@ -1,35 +1,17 @@
-var app = angular.module('fatt',[])
-
-app.directive('modalDialog', function() {
-  return {
-    restrict: 'E',
-    scope: {
-      show: '='
-    },
-    replace: true, // Replace with the template below
-    transclude: true, // we want to insert custom content inside the directive
-    link: function(scope, element, attrs) {
-      scope.dialogStyle = {};
-      if (attrs.width)
-        scope.dialogStyle.width = attrs.width;
-      if (attrs.height)
-        scope.dialogStyle.height = attrs.height;
-      scope.hideModal = function() {
-        scope.show = false;
-      };
-    },
-    template: "<div class='ng-modal' ng-show='show'><div class='ng-modal-overlay' ng-click='hideModal()'></div><div class='ng-modal-dialog' ng-style='dialogStyle'><div class='ng-modal-close' ng-click='hideModal()'>X</div><div class='ng-modal-dialog-content' ng-transclude></div></div></div>"
-  };
-});
-
+var app = angular.module('fatt',['ui.bootstrap'])
 
 app.controller('MainCtrl', function($scope, $http) {
   var projects = {};
   var tasks = {};
   var contacts = {};
   var activeProjects = undefined;
+  var commonRecords = [];
+  var me = undefined;
+
+  getMe(function(foundMe){$scope.me = foundMe});
 
   $scope.modalShown = false;
+  $scope.commonRecords = commonRecords;
 
   var today = moment().utc().startOf('day');
   var faDateFormat = "YYYY-MM-DD";
@@ -38,13 +20,12 @@ app.controller('MainCtrl', function($scope, $http) {
   var month = today.clone().startOf('month')
 
   $scope.month = month
-  $scope.monthName = month.format("MMMM")
+  $scope.monthName = month.format("MMMM YYYY")
 
   var offset = month.isoWeekday() - 1
   var firstDay = month.clone().subtract(offset, 'days')
   var currentDate = firstDay.clone();
   var lastDay = firstDay.clone().add(6, 'weeks')
-
 
   var weeks = []
   var database = {}
@@ -63,7 +44,7 @@ app.controller('MainCtrl', function($scope, $http) {
       }
 
       if(currentDate.format(faDateFormat) == today.format(faDateFormat)) {
-        status = 'active'
+        status = 'active text-primary'
       }
 
       var dayObject = {
@@ -79,22 +60,11 @@ app.controller('MainCtrl', function($scope, $http) {
       database[name] = dayObject
       dayObject.add = function() {
         var currentDayObject = dayObject;
-        return function() {
-           $scope.modalShown = !$scope.modalShown;
-           /*
-           currentDayObject.records.push({
-             projectName: "Proj",
-             taskName: "Task",
-             contactName: "Contact",
-             hours: 3
-           });
+        return function(record) {
 
-           currentDayObject.total = currentDayObject.records.reduce(
-             function(acc, cur){
-               return +acc + +cur.hours;
-             }, 0
-           )
-           */
+          addRecordLike(currentDayObject, record);
+
+
         }
       }();
 
@@ -102,8 +72,59 @@ app.controller('MainCtrl', function($scope, $http) {
     }
     weeks.push(week)
   }
-  console.log(weeks)
+
+  function addRecordLike(day, record) {
+    getMe(function(me){
+
+      console.log(me);
+      console.log(day);
+      console.log(record);
+
+      var timeslip = {
+        timeslip: {
+          user: me.url,
+          project: record.projectUrl,
+          task: record.taskUrl,
+          dated_on: day.name,
+          hours: record.hours,
+          comment: 'Created using fatt'
+        }
+      };
+
+      console.log(timeslip);
+      $http.post('/freeagent/timeslips', timeslip).success( function(data) {
+        readTimeslips();
+      });
+    });
+  }
+
+  // '/freeagent/users/me'
+  function getMe(callback){
+
+    if(Array.isArray(me)) {
+      me.push(callback)
+    } else if(typeof(me) == 'object') {
+      if(typeof(callback) == 'function') {
+        callback(me);
+      }
+    } else {
+      me = [];
+      me.push(callback)
+
+      $http.get('/freeagent/users/me').success(function(data) {
+        var callbacks = me;
+        me = data.user
+
+        for(var idx=0; idx<callbacks.length; idx++) {
+          getMe(callbacks[idx]);
+        }
+      });
+    }
+  }
+
+
   $scope.weeks = weeks
+  readTimeslips();
 
   function resolveProjectName(record) {
     var project = projects[record.projectUrl];
@@ -177,41 +198,69 @@ app.controller('MainCtrl', function($scope, $http) {
     }
   }
 
-
-  //$http.get('/api/freeagent/v2/timeslips?from_date=2012-01-01&to_date=2012-03-31')
-  $http.get('/freeagent/timeslips?from_date='+firstDay.format(faDateFormat)+'&to_date='+lastDay.format(faDateFormat)).success(function(data){
-    var timeSlips = data;
-    var index;
-
-    for(var index in data.timeslips) {
-      var timeslip = data.timeslips[index]
-
-      var obj = database[timeslip.dated_on];
-
-      if(obj) {
-        console.log("Found: ", obj.name)
-        obj.total += +timeslip.hours
-
-        var record = {
-          projectUrl: timeslip.project,
-          taskUrl: timeslip.task,
-          projectName: "_",
-          taskName: "_",
-          contactName: "_",
-          hours: +timeslip.hours
-        }
-
-        obj.records.push(record)
-
-        resolveProjectName(record)
-        resolveTaskName(record)
+  function addRecordToCommon(record) {
+    var match = commonRecords.reduce(function(found, x) {
+      if(found === null && x.hours == record.hours && x.taskUrl == record.taskUrl) {
+        return x
       }
-    }
+      return found;
+    }, null);
 
-    for(var idx in database) {
-      var day = database[idx];
-      calcStatus(day)
+    if(match === null) {
+      record.useCount++;
+      commonRecords.push(record)
+    } else {
+      match.useCount++;
+
     }
+  }
+
+  function readTimeslips() {
+    $http.get('/freeagent/timeslips?from_date='+firstDay.format(faDateFormat)+'&to_date='+lastDay.format(faDateFormat)).success(function(data){
+      console.log("Done reading timeslips");
+
+      for(var idx in database) {
+        var day = database[idx];
+        day.records = [];
+        day.total = 0;
+      }
+
+      var timeSlips = data;
+      var index;
+
+      for(var index in data.timeslips) {
+        var timeslip = data.timeslips[index]
+
+        var obj = database[timeslip.dated_on];
+
+        if(obj) {
+
+          obj.total += +timeslip.hours
+
+          var record = {
+            projectUrl: timeslip.project,
+            taskUrl: timeslip.task,
+            projectName: "_",
+            taskName: "_",
+            contactName: "_",
+            hours: +timeslip.hours,
+            useCount: 0
+          }
+
+          addRecordToCommon(record);
+
+          obj.records.push(record)
+
+          resolveProjectName(record)
+          resolveTaskName(record)
+        }
+      }
+
+      for(var idx in database) {
+        var day = database[idx];
+        calcStatus(day)
+      }
+    });
 
     function calcStatus(day) {
 
@@ -221,7 +270,6 @@ app.controller('MainCtrl', function($scope, $http) {
         if(activeProjects.projects.length == 1) {
           var requiredHours = +(activeProjects.projects[0].hours_per_day);
 
-          console.log(day.date, today, day.date < today)
 
           if(day.date < today && day.date.isoWeekday() < 6){
 
@@ -248,34 +296,5 @@ app.controller('MainCtrl', function($scope, $http) {
       }
     }
 
-    function resolveProjects(continuation) {
-
-      $http.get('/freeagent/projects').success(function(data) {
-        var projects = data;
-        console.log('projects:', data);
-        // var index;
-        //
-        // for(index in data.timeslips) {
-        //   var timeslip = data.timeslips[index]
-        //
-        //   var obj = database[timeslip.dated_on];
-        //
-        //   if(obj){
-        //     obj.total += timeslip.hours
-        //     obj.records.push({
-        //       projectUrl: timeslips.project,
-        //       taskUrl: timeslips.task,
-        //       lable: timeslip.project,
-        //       hours: timeslip.hours
-        //     })
-        //   }
-      });
-    }
-
-    function resolveTasks() {
-
-    }
-
-    //resolveProjects(function(){resolveTasks();});
-  })
+  }
 });

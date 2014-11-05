@@ -28,24 +28,51 @@ module.exports = function(config) {
           console.log(pathToJson)
 
           fs.readFile(pathToJson, function(error, data){
-            callback(error, response, replaceReferences(data))
+            callback(error, response, replaceRemoteWithLocal(data))
           });
         } else {
-          callback(error, response, replaceReferences(body))
+          callback(error, response, replaceRemoteWithLocal(body))
         };
       }
-      );
+    );
   };
 
-  var replaceReferences = function(body) {
+  var apiPost = function(authToken, url, body, callback){
+    var fixedBody = replaceLocalWithRemote(body);
+    var options = {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'node.js',
+        'Authorization': 'Bearer '+authToken
+      },
+      body: fixedBody
+    };
+
+
+    request.post(url, options, function(error, response, body){
+      console.log("Response to POST: ", body);
+      callback(error, response, body);
+    })
+  }
+
+  var replaceRemoteWithLocal = function(body) {
     var regex = new RegExp(config.freeagentApi, 'g');
     console.log('replacing', regex, config.siteName+"/freeagent")
 
     return (body+"").replace(regex, config.siteName+"/freeagent")
+  }
 
+  var replaceLocalWithRemote = function(body) {
+    var regex = new RegExp(config.siteName+"/freeagent", 'g');
+    var replace = config.freeagentApi;
+
+    console.log('replacing', regex, replace)
+    return (body+"").replace(regex, replace)
   }
 
   return {
     apiGet: apiGet,
+    apiPost: apiPost,
   };
 };
