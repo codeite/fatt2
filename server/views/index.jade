@@ -2,7 +2,10 @@ extends layout
 
 block content
   div(ng-controller='MainCtrl')
-    h1 {{monthName}}
+    h1
+      // a(ng-click="lastMonth()").btn << 
+      | {{monthName}}
+      // a(ng-click="nextMonth()").btn >>
     h2 Logged in as : {{me.first_name}} {{me.last_name}}
     
 

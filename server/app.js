@@ -72,7 +72,7 @@ app.get('/callback', function (req, res) {
     console.log(token)
     res.cookie('access_token', token.token.access_token, { maxAge: 604800000, path: '/' });
     res.cookie('refresh_token', token.token.refresh_token, { maxAge: 604800000, path: '/' });
-    res.send('passed')
+    res.redirect('/')
   }
 
 });

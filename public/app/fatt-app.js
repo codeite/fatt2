@@ -278,18 +278,22 @@ app.controller('MainCtrl', function($scope, $http) {
       if(Array.isArray(activeProjects)) {
         activeProjects.push(day)
       } else if(typeof(activeProjects) == 'object') {
-        if(activeProjects.projects.length == 1) {
-          var requiredHours = +(activeProjects.projects[0].hours_per_day);
 
+        var requiredHours = 0;
+        for(var idx = 0; idx < activeProjects.projects.length; idx++) {
+          var x = +(activeProjects.projects[idx].hours_per_day);
+          if(x > requiredHours)
+            requiredHours = x;
+        }
 
-          if(day.date < today && day.date.isoWeekday() < 6){
+        if(day.date < today && day.date.isoWeekday() < 6){
 
-            if(day.total < requiredHours) {
-              day.status = 'danger'
-            } else {
-              day.status = 'success'
-            }
+          if(day.total < requiredHours) {
+            day.status = 'danger'
+          } else {
+            day.status = 'success'
           }
+
         }
       } else {
         activeProjects = [];
