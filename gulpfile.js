@@ -3,8 +3,9 @@ var nodemon = require('gulp-nodemon')
 
 gulp.task('startServer', function() {
   nodemon({
-    script: 'app.js',
+    script: 'server/app.js',
     ext: 'html js',
+    watch: [ 'server' ],
     env: {
       'NODE_ENV': 'development'
     }
@@ -15,5 +16,5 @@ gulp.task('startServer', function() {
 });
 
 gulp.task('default', ['startServer'], function(){
-  gulp.watch ['**/*.js']
+  gulp.watch ['server/**/*.js']
 });
