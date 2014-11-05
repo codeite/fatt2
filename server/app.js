@@ -46,6 +46,10 @@ app.get('/auth', function (req, res) {
     res.redirect(authorization_uri);
 });
 
+app.get('/config', function(req, res) {
+  res.send('{ "port": ' + port + '}')
+})
+
 // Callback service parsing the authorization token and asking for the access token
 app.get('/callback', function (req, res) {
   var code = req.query.code;
