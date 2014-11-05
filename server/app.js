@@ -8,33 +8,35 @@ var Cookies = require( "cookies" )
 var cookieParser = require('cookie-parser')
 var request = require('request');
 
+var config = {
+  port: (process.env.PORT || 4848),
+  fattClientId: (process.env.FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g"),
+  fattClientSecret: (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw"),
+  freeagentApi: (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2"),
+  siteName: (process.env.SITE_NAME || "http://localhost"),
+  callbackUrl: (process.env.CALLBACK_URL || "http://localhost/callback")
+}
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
-var freeagentRoutes = require('./routes/freeagentRoutes');
+var freeagentRoutes = require('./routes/freeagentRoutes')(config);
 
 var app = express();
 
+app.set('port', config.port)
 app.use(cookieParser())
 
-var port = (process.env.PORT || 4848);
-app.set('port', port)
-var fattClientId = (process.env.FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g");
-var fattClientSecret = (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw");
-var freeagentApi = (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2");
-var callbackUrl = (process.env.CALLBACK_URL || "http://localhost/callback");
-
 var oauth2 = require('simple-oauth2')({
-  clientID: fattClientId,
-  clientSecret: fattClientSecret,
-  site: freeagentApi,
+  clientID: config.fattClientId,
+  clientSecret: config.fattClientSecret,
+  site: config.freeagentApi,
   authorizationPath: '/approve_app',
   tokenPath: '/token_endpoint',
 });
 
 // Authorization uri definition
 var authorization_uri = oauth2.authCode.authorizeURL({
-  redirect_uri: callbackUrl,
+  redirect_uri: config.callbackUrl,
   scope: 'notifications',
   state: '0'
 });
@@ -45,7 +47,7 @@ app.get('/auth', function (req, res) {
 });
 
 app.get('/config', function(req, res) {
-  res.send('{ "port": ' + port + '}')
+  res.send(JSON.stringify(config))
 })
 
 // Callback service parsing the authorization token and asking for the access token
@@ -56,7 +58,7 @@ app.get('/callback', function (req, res) {
 
   oauth2.authCode.getToken({
     code: code,
-    redirect_uri: callbackUrl
+    redirect_uri: config.callbackUrl
   }, saveToken);
 
   function saveToken(error, result) {
@@ -120,7 +122,7 @@ app.use(function(err, req, res, next) {
     });
 });
 
-app.listen(port)
-console.log("App listening on port "+port)
+app.listen(config.port)
+console.log("App listening on port "+config.port)
 
 module.exports = app;
