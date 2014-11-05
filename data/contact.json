@@ -1,0 +1,17 @@
+{
+  "contact": {
+    "status": "Active",
+    "created_at": "2014-11-01T17:29:12Z",
+    "first_name": "Bob",
+    "last_name": "Jones",
+    "url": "https://api.sandbox.freeagent.com/v2/contacts/27525",
+    "country": "United Kingdom",
+    "uses_contact_invoice_sequence": false,
+    "charge_sales_tax": "Auto",
+    "updated_at": "2014-11-01T17:29:12Z",
+    "contact_name_on_invoices": true,
+    "locale": "en",
+    "account_balance": "0.0",
+    "organisation_name": "Bob Inc"
+  }
+}
