@@ -22,9 +22,7 @@ app.set('port', port)
 var fattClientId = (process.env.FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g");
 var fattClientSecret = (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw");
 var freeagentApi = (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2");
-var siteName = (process.env.SITE_NAME || "http://localhost");
-
-var callbackUrl = siteName+':'+port+'/callback'
+var callbackUrl = (process.env.CALLBACK_URL || "http://localhost/callback");
 
 var oauth2 = require('simple-oauth2')({
   clientID: fattClientId,
