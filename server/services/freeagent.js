@@ -56,6 +56,28 @@ module.exports = function(config) {
     })
   }
 
+  var apiDelete = function(authToken, url, callback) {
+
+    if(url.indexOf('timeslip') == -1) {
+      console.log("Can only delete timeslips");
+      callback("Can only delete timeslips", null, null);
+      return;
+    }
+
+    var options = {
+      headers: {
+        'User-Agent': 'node.js',
+        'Authorization': 'Bearer '+authToken
+      }
+    };
+
+    console.log("About to delete", url)
+    request.del(url, options, function(error, response, body){
+      console.log("Response to DELETE: ", body);
+      callback(error, response, body);
+    });
+  }
+
   var replaceRemoteWithLocal = function(body) {
     var regex = new RegExp(config.freeagentApi, 'g');
     console.log('replacing', regex, config.siteName+"/freeagent")
@@ -74,5 +96,6 @@ module.exports = function(config) {
   return {
     apiGet: apiGet,
     apiPost: apiPost,
+    apiDelete: apiDelete,
   };
 };

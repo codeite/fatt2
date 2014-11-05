@@ -36,7 +36,10 @@ block content
                 td Total:
                 td {{day.total}}h
               tr(ng-repeat="record in day.records")
-                td: div(title="{{record.contactName}}: {{record.projectName}}") {{record.taskName}}:
+                td: div(title="{{record.contactName}}: {{record.projectName}}")
+                  button.danger.btn.btn-xs.btn-link(type="button" ng-click="record.delete()")
+                    span.glyphicon.glyphicon-remove-sign
+                  | {{record.taskName}}:
                 td {{record.hours}}h
 
 

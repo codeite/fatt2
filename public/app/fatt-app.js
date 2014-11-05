@@ -73,6 +73,12 @@ app.controller('MainCtrl', function($scope, $http) {
     weeks.push(week)
   }
 
+  function deleteTimeslip(timeslipUrl) {
+    $http.delete(timeslipUrl).success( function(data) {
+      readTimeslips();
+    });
+  }
+
   function addRecordLike(day, record) {
     getMe(function(me){
 
@@ -238,13 +244,18 @@ app.controller('MainCtrl', function($scope, $http) {
           obj.total += +timeslip.hours
 
           var record = {
+            timeslipUrl: timeslip.url,
             projectUrl: timeslip.project,
             taskUrl: timeslip.task,
             projectName: "_",
             taskName: "_",
             contactName: "_",
             hours: +timeslip.hours,
-            useCount: 0
+            useCount: 0,
+            delete: function(){
+              if(confirm("Delete this?"))
+                deleteTimeslip(this.timeslipUrl);
+            }
           }
 
           addRecordToCommon(record);

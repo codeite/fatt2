@@ -67,5 +67,36 @@ module.exports = function(config) {
     );
   });
 
+  router.delete('/*', function(req, res) {
+    var path = req.path
+    console.log('path:', path)
+    var query = req.query;
+    var url = config.freeagentApi+path
+
+    if(Array.isArray(query) && query.length > 0) {
+      url += '?'
+
+      for(var i in query) {
+        url += (i + "=" + query[i] + "&")
+      }
+    }
+
+    console.log("DELETE: "+url)
+
+    var authToken = req.cookies.access_token
+
+    console.log("Auth: "+authToken)
+    console.log(req.body)
+
+    freeagent.apiDelete(authToken, url,
+       function (error, response, body) {
+           //if (!error && response.statusCode == 200) {
+               //console.log('body', body)
+           //}
+           res.send("");
+       }
+    );
+  });
+
   return router;
 }
