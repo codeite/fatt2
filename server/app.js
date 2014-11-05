@@ -14,7 +14,7 @@ var config = {
   fattClientSecret: (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw"),
   freeagentApi: (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2"),
   siteName: (process.env.SITE_NAME || "http://localhost:4848"),
-  callbackUrl: (process.env.CALLBACK_URL || "http://localhost/callback")
+  callbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/callback")
 }
 
 var routes = require('./routes/index');
