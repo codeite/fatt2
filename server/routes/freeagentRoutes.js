@@ -9,16 +9,17 @@ module.exports = function(config) {
 
   router.get('/*', function(req, res) {
     var path = req.path
-    console.log('path:', path)
     var query = req.query;
     var url = config.freeagentApi+path
 
-    if(Array.isArray(query) && query.length > 0) {
+    if(typeof(query) == 'object') {
       url += '?'
 
+      var bits = []
       for(var i in query) {
-        url += (i + "=" + query[i] + "&")
+        bits.push(i + "=" + query[i])
       }
+      url += bits.join("&");
     }
 
     console.log("GET: "+url)
@@ -38,17 +39,19 @@ module.exports = function(config) {
 
   router.post('/*', function(req, res) {
     var path = req.path
-    console.log('path:', path)
     var query = req.query;
     var url = config.freeagentApi+path
 
-    if(Array.isArray(query) && query.length > 0) {
+    if(typeof(query) == 'object') {
       url += '?'
 
+      var bits = []
       for(var i in query) {
-        url += (i + "=" + query[i] + "&")
+        bits.push(i + "=" + query[i])
       }
+      url += bits.join("&");
     }
+
 
     console.log("POST: "+url)
 
@@ -69,17 +72,19 @@ module.exports = function(config) {
 
   router.delete('/*', function(req, res) {
     var path = req.path
-    console.log('path:', path)
     var query = req.query;
     var url = config.freeagentApi+path
 
-    if(Array.isArray(query) && query.length > 0) {
+    if(typeof(query) == 'object') {
       url += '?'
 
+      var bits = []
       for(var i in query) {
-        url += (i + "=" + query[i] + "&")
+        bits.push(i + "=" + query[i])
       }
+      url += bits.join("&");
     }
+
 
     console.log("DELETE: "+url)
 
