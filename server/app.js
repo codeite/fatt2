@@ -17,14 +17,19 @@ var app = express();
 
 app.use(cookieParser())
 
-var port = 4848;
-process.env.DEBUG = true
-var callbackUrl = 'http://localhost:'+port+'/callback'
+var port = (process.env.PORT || 4848);
+app.set('port', port)
+var fattClientId = (process.env.FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g");
+var fattClientSecret = (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw");
+var freeagentApi = (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2");
+var siteName = (process.env.SITE_NAME || "http://localhost");
+
+var callbackUrl = siteName+':'+port+'/callback'
 
 var oauth2 = require('simple-oauth2')({
-  clientID: "ZnVY2G0fN-ZzL0-XBi7L_g",
-  clientSecret: "4OdDfW36ONBQug4Y2_3lDw",
-  site: 'https://api.sandbox.freeagent.com/v2',
+  clientID: fattClientId,
+  clientSecret: fattClientSecret,
+  site: freeagentApi,
   authorizationPath: '/approve_app',
   tokenPath: '/token_endpoint',
 });
