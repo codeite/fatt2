@@ -13,7 +13,7 @@ var config = {
   fattClientId: (process.env.FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g"),
   fattClientSecret: (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw"),
   freeagentApi: (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2"),
-  siteName: (process.env.SITE_NAME || "http://localhost"),
+  siteName: (process.env.SITE_NAME || "http://localhost:4848"),
   callbackUrl: (process.env.CALLBACK_URL || "http://localhost/callback")
 }
 
@@ -48,6 +48,10 @@ app.get('/auth', function (req, res) {
 
 app.get('/config', function(req, res) {
   res.send(JSON.stringify(config))
+})
+
+app.get('/add-ts', function(req, res) {
+  res.render('add-ts');
 })
 
 // Callback service parsing the authorization token and asking for the access token
