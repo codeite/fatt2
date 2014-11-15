@@ -1,4 +1,4 @@
-angular.module("fatt", ['ui.bootstrap'])
+angular.module("fatt")
   .factory("faApi", ["$http", function($http) {
     var database = {};
 
