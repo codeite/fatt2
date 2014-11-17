@@ -1,6 +1,7 @@
 angular.module('fatt')
-  .controller('MainCtrl', ['$scope', '$http', 'faApi', function($scope, $http, faApi) {
+  .controller('MainCtrl', ['$scope', '$http', 'faApi', 'month', function($scope, $http, faApi, monthCalculator) {
     var commonRecords = [];
+    var database = {}
 
     faApi.getMe(function(foundMe) {$scope.me = foundMe} );
 
@@ -8,64 +9,34 @@ angular.module('fatt')
     $scope.commonRecords = commonRecords;
 
     var today = moment().utc().startOf('day');
-    var faDateFormat = "YYYY-MM-DD";
     $scope.today = today.day();
 
     var month = today.clone().startOf('month')
 
-    $scope.month = month
-    $scope.monthName = month.format("MMMM YYYY")
-
-    var offset = month.isoWeekday() - 1
-    var firstDay = month.clone().subtract(offset, 'days')
-    var currentDate = firstDay.clone();
-    var lastDay = firstDay.clone().add(6, 'weeks')
-
-    var weeks = []
-    var database = {}
-
-    for(var weekIndex=0; weekIndex<6; weekIndex++) {
-      var week = []
-      for (var i=0; i<7; i++) {
-        var name = currentDate.format(faDateFormat);
-
-        var thisMonth = currentDate.month() == month.month();
-
-        var status = '';
-
-        if(currentDate.isoWeekday() >= 6) {
-          status = 'warning'
-        }
-
-        if(currentDate.format(faDateFormat) == today.format(faDateFormat)) {
-          status = 'active text-primary'
-        }
-
-        var dayObject = {
-          date: currentDate.clone(),
-          day: currentDate.format("Do"),
-          total: 0,
-          records: [],
-          name: name,
-          status: status,
-          thisMonth: thisMonth?'':'text-muted'
-        };
-        week.push(dayObject)
-        database[name] = dayObject
-        dayObject.add = function() {
-          var currentDayObject = dayObject;
-          return function(record) {
-
-            addRecordLike(currentDayObject, record);
 
 
-          }
-        }();
+    function loadPage() {
+      $scope.month = month
+      $scope.monthName = month.format("MMMM YYYY")
 
-        currentDate.add(1, 'days')
-      }
-      weeks.push(week)
+      var result = monthCalculator.calcMonth(month, addRecordLike, database, today);
+      $scope.weeks = result.weeks;
+      readTimeslips(result.firstDay, result.lastDay);
     }
+
+    loadPage();
+
+    $scope.prevMonth = function() {
+      month.add(-1, 'months');
+      loadPage();
+    }
+
+    $scope.nextMonth = function() {
+      month.add(1, 'months');
+      loadPage();
+    }
+
+
 
     function deleteTimeslip(timeslipUrl) {
       $http.delete(timeslipUrl).success( function(data) {
@@ -92,13 +63,12 @@ angular.module('fatt')
 
         console.log(timeslip);
         $http.post('/freeagent/timeslips', timeslip).success( function(data) {
-          readTimeslips();
+          loadPage();
         });
       });
     }
 
-    $scope.weeks = weeks
-    readTimeslips();
+
 
     function resolveProjectName(record) {
       faApi.resolveProject(record.projectUrl, function(project) {
@@ -137,8 +107,9 @@ angular.module('fatt')
       }
     }
 
-    function readTimeslips() {
-      $http.get('/freeagent/timeslips?from_date='+firstDay.format(faDateFormat)+'&to_date='+lastDay.format(faDateFormat)).success(function(data){
+    function readTimeslips(firstDay, lastDay) {
+      faApi.readTimeslips(firstDay.format(monthCalculator.faDateFormat), lastDay.format(monthCalculator.faDateFormat), function(data) {
+
         console.log("Done reading timeslips");
 
         for(var idx in database) {
@@ -206,7 +177,7 @@ angular.module('fatt')
               day.status = 'success'
             }
           }
-        });      
+        });
       }
     }
   }]);

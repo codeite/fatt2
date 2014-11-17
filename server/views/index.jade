@@ -3,9 +3,9 @@ extends layout
 block content
   div(ng-controller='MainCtrl')
     h1
-      // a(ng-click="lastMonth()").btn << 
+      button(ng-click="prevMonth()").btn &lt;&lt;
       | {{monthName}}
-      // a(ng-click="nextMonth()").btn >>
+      button(ng-click="nextMonth()").btn &gt;&gt;
     h2 Logged in as : {{me.first_name}} {{me.last_name}}
     
 

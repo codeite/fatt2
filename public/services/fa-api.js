@@ -22,6 +22,13 @@ angular.module("fatt")
       getAndCache(contactUrl, "contact", callback);
     }
 
+    function readTimeslips(from_date, to_date, callback) {
+    	var url = '/freeagent/timeslips?from_date='+from_date+'&to_date='+to_date;
+    	$http.get(url).success(function(data) {
+    		callback(data);
+    	});
+    }
+
     var getAndCache = function(url, transform, callback) {
       if(typeof(callback) != "function") {
         callback = function(){};
@@ -64,7 +71,8 @@ angular.module("fatt")
       getActiveProjects : getActiveProjects,
       resolveProject: resolveProject,
       resolveTask: resolveTask,
-      resolveContact: resolveContact
+      resolveContact: resolveContact,
+      readTimeslips: readTimeslips
 
     };
   }])
