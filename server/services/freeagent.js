@@ -4,14 +4,35 @@ module.exports = function(config) {
   var path = require('path');
 
   var apiGet = function(authToken, url, callback) {
+    var cachedResponse = config.cache.get(url)[url];
+
+
+    headers = {
+      'Accept': 'application/json',
+      'User-Agent': 'node.js',
+      'Authorization': 'Bearer '+authToken
+    };
+
+
+    if(cachedResponse) {
+      console.log("Found this in the cache:", cachedResponse['etag'])
+      headers['If-none-match'] = cachedResponse.etag;
+    } else {
+      console.log("Not in cache")
+    }
+
+    function whenDone(error, response, body, callback) {
+      for(key in response.headers) {
+        response.headers[key] = replaceRemoteWithLocal(response.headers[key]);
+      }
+
+      callback(error, response, replaceRemoteWithLocal(body))
+    }
+
     request.get(
       url,
       {
-        headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'node.js',
-          'Authorization': 'Bearer '+authToken
-        }
+        headers: headers
       },
       function(error, response, body) {
         if(error) {
@@ -32,13 +53,20 @@ module.exports = function(config) {
           });
         } else {
 
-          for(key in response.headers) {
-            response.headers[key] = replaceRemoteWithLocal(response.headers[key]);
+
+
+          if(response.statusCode == 200) {
+            config.cache.set(url, {
+              etag: response.headers['etag'],
+              response: response,
+              body: body
+            });
+
+            whenDone(error, response, body, callback)
+          } else if(response.statusCode == 304) {
+            console.log("Using cached response");
+            whenDone(null, cachedResponse.response, cachedResponse.body, callback);
           }
-
-          console.log(response.headers);
-
-          callback(error, response, replaceRemoteWithLocal(body))
         };
       }
     );
@@ -87,7 +115,7 @@ module.exports = function(config) {
 
   var replaceRemoteWithLocal = function(body) {
     var regex = new RegExp(config.freeagentApi, 'g');
-    console.log('replacing', regex, config.siteName+"/freeagent")
+    //console.log('replacing', regex, config.siteName+"/freeagent")
 
     return (body+"").replace(regex, config.siteName+"/freeagent")
   }
@@ -96,7 +124,7 @@ module.exports = function(config) {
     var regex = new RegExp(config.siteName+"/freeagent", 'g');
     var replace = config.freeagentApi;
 
-    console.log('replacing', regex, replace)
+    //console.log('replacing', regex, replace)
     return (body+"").replace(regex, replace)
   }
 

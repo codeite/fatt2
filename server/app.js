@@ -7,6 +7,8 @@ var bodyParser = require('body-parser');
 var Cookies = require( "cookies" )
 var cookieParser = require('cookie-parser')
 var request = require('request');
+var NodeCache = require( "node-cache" );
+var myCache = new NodeCache();
 
 var config = {
   port: (process.env.PORT || 4848),
@@ -14,7 +16,8 @@ var config = {
   fattClientSecret: (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw"),
   freeagentApi: (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2"),
   siteName: (process.env.SITE_NAME || "http://localhost:4848"),
-  callbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/callback")
+  callbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/callback"),
+  cache: myCache
 }
 
 var routes = require('./routes/index');
