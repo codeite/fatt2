@@ -24,9 +24,45 @@ angular.module("fatt")
 
     function readTimeslips(from_date, to_date, callback) {
     	var url = '/freeagent/timeslips?from_date='+from_date+'&to_date='+to_date;
-    	$http.get(url).success(function(data) {
-    		callback(data);
-    	});
+      readList(url, callback, 'timeslips');
+    }
+
+    function readList(url, callback, propertyName, progress) {
+      $http.get(url).success(function(data, status, headers) {
+        if(progress) {
+          progress[propertyName] = progress[propertyName].concat(data[propertyName]);
+        } else {
+          progress = data;
+        }
+
+        var links = readLinks(headers())
+
+        if(links.next) {
+          readList(links.next, callback, propertyName, progress);
+        } else {
+          callback(progress);
+        }
+
+
+      });
+    }
+
+    var readLinks = function(headers) {
+      if(!headers.link || headers.link == ""){
+        return {}
+      }
+
+      var bits = headers.link.split(',');
+
+      var res = bits.reduce(function(result, bit) {
+        var leftRight = bit.split(';');
+        var linkVal = leftRight[0].trim().substr(1).slice(0,-1);
+        var linkName = leftRight[1].trim().substr(5).slice(0,-1);
+        result[linkName] = linkVal;
+        return result;
+      }, {});
+
+      return res;
     }
 
     var getAndCache = function(url, transform, callback) {

@@ -40,7 +40,7 @@ angular.module('fatt')
 
     function deleteTimeslip(timeslipUrl) {
       $http.delete(timeslipUrl).success( function(data) {
-        readTimeslips();
+        loadPage();
       });
     }
 

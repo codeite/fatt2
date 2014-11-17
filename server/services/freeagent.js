@@ -31,6 +31,13 @@ module.exports = function(config) {
             callback(error, response, replaceRemoteWithLocal(data))
           });
         } else {
+
+          for(key in response.headers) {
+            response.headers[key] = replaceRemoteWithLocal(response.headers[key]);
+          }
+
+          console.log(response.headers);
+
           callback(error, response, replaceRemoteWithLocal(body))
         };
       }

@@ -32,6 +32,7 @@ module.exports = function(config) {
           //if (!error && response.statusCode == 200) {
               //console.log('body', body)
           //}
+          res.set('link', response.headers.link || '');
           res.send(body);
       }
     );
