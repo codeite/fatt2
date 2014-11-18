@@ -1,5 +1,5 @@
 module.exports = function(app) {
-
+  'use strict';
   app.directive('modalDialog', function() {
     return {
       restrict: 'E',
@@ -10,10 +10,12 @@ module.exports = function(app) {
       transclude: true, // we want to insert custom content inside the directive
       link: function(scope, element, attrs) {
         scope.dialogStyle = {};
-        if (attrs.width)
+        if (attrs.width) {
           scope.dialogStyle.width = attrs.width;
-        if (attrs.height)
+        }
+        if (attrs.height) {
           scope.dialogStyle.height = attrs.height;
+        }
         scope.hideModal = function() {
           scope.show = false;
         };

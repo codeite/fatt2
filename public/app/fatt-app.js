@@ -1,2 +1,1 @@
-angular.module('fatt', ['ui.bootstrap'])
-  
+angular.module('fatt', ['ui.bootstrap']);
