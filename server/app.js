@@ -11,42 +11,28 @@ module.exports = (function (){
 
   var config = {
     port: (process.env.PORT || 4848),
+
+    mongodbUrl : (process.env.MONGO_DB_URL || "mongodb://fatt-website:LlQHuBH6gAnzHdj@ds033170.mongolab.com:33170/fatt"),
+
     fattClientId: (process.env.FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g"),
     fattClientSecret: (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw"),
     freeagentApi: (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2"),
-    siteName: (process.env.SITE_NAME || "http://localhost:4848"),
-    callbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/callback"),
-    cache: myCache
-  };
 
-  var routes = require('./routes/index');
-  var users = require('./routes/users');
-  var freeagentRoutes = require('./routes/freeagentRoutes')(config);
+    googleClientId: (process.env.GOOGLE_CLIENT_ID || "121875671159-tggl2f47e171usdatcn4fnpeabkc6f76.apps.googleusercontent.com"),
+    googleClientSecret: (process.env.GOOGLE_CLIENT_SECRET || "TEW03Pw8qcWFXwy0qIAFHWdy"),
+    googleApi: (process.env.GOOGLE_API || "https://accounts.google.com/o/oauth2"),
+
+    siteName: (process.env.SITE_NAME || "http://localhost:4848"),
+    callbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/auth/callback"),
+    googleCallbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/google/callback"),
+    cache: myCache
+
+  };
 
   var app = express();
 
   app.set('port', config.port);
   app.use(cookieParser());
-
-  var oauth2 = require('simple-oauth2')({
-    clientID: config.fattClientId,
-    clientSecret: config.fattClientSecret,
-    site: config.freeagentApi,
-    authorizationPath: '/approve_app',
-    tokenPath: '/token_endpoint',
-  });
-
-  // Authorization uri definition
-  var authorizationUri = oauth2.authCode.authorizeURL({
-    'redirect_uri': config.callbackUrl,
-    'scope': 'full',
-    'state': '0'
-  });
-
-  // Initial page redirecting to FreeAgent
-  app.get('/auth', function (req, res) {
-    res.redirect(authorizationUri);
-  });
 
   app.get('/config', function(req, res) {
     res.send(JSON.stringify(config));
@@ -56,39 +42,9 @@ module.exports = (function (){
     res.render('add-ts');
   });
 
-  // Callback service parsing the authorization token and asking for the access token
-  app.get('/callback', function (req, res) {
-    var code = req.query.code;
-    console.log('/callback');
-    console.log(code);
-
-
-
-    function saveToken(error, result) {
-      var accessTokenKey = 'access_token';
-      var refreshTokenKey = 'refresh_token';
-
-      if (error) { console.log('Access Token Error', error); res.send("Failed"); return; }
-      console.log(result);
-      var token = oauth2.accessToken.create(result);
-      console.log(token);
-      res.cookie(accessTokenKey, token.token[accessTokenKey], { maxAge: 604800000, path: '/' });
-      res.cookie(refreshTokenKey, token.token[refreshTokenKey], { maxAge: 604800000, path: '/' });
-      res.redirect('/');
-    }
-
-    oauth2.authCode.getToken({
-      'code': code,
-      'redirect_uri': config.callbackUrl
-    }, saveToken);
-
-  });
-
-
   // view engine setup
   app.set('views', path.join(__dirname, 'views'));
   app.set('view engine', 'jade');
-
 
   // uncomment after placing your favicon in /public
   //app.use(favicon(__dirname + '/public/favicon.ico'));
@@ -98,9 +54,12 @@ module.exports = (function (){
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, '../public')));
 
-  app.use('/', routes);
-  app.use('/users', users);
-  app.use('/freeagent', freeagentRoutes);
+  // Routes
+  app.use('/', require('./routes/index'));
+  app.use('/users', require('./routes/users'));
+  app.use('/freeagent', require('./routes/freeagentRoutes')(config));
+  app.use('/auth', require('./routes/faAuth')(config));
+  app.use('/google', require('./routes/googleAuth')(config));
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {
