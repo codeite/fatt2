@@ -1,19 +1,21 @@
-module.exports = function (config){
+module.exports = function (path, config){
   'use strict';
   var express = require('express');
   var router = express.Router();
 
+  var callbackUrl = config.siteName + path + "/callback";
+
   var oauth2 = require('simple-oauth2')({
-    clientID: config.fattClientId,
-    clientSecret: config.fattClientSecret,
-    site: config.freeagentApi,
+    clientID: config.freeagent.fattClientId,
+    clientSecret: config.freeagent.fattClientSecret,
+    site: config.freeagent.apiUrl,
     authorizationPath: '/approve_app',
     tokenPath: '/token_endpoint',
   });
 
   // Authorization uri definition
   var authorizationUri = oauth2.authCode.authorizeURL({
-    'redirect_uri': config.callbackUrl,
+    'redirect_uri': callbackUrl,
     'scope': 'full',
     'state': '0'
   });
@@ -40,7 +42,7 @@ module.exports = function (config){
 
     oauth2.authCode.getToken({
       'code': code,
-      'redirect_uri': config.callbackUrl
+      'redirect_uri': callbackUrl
     }, saveToken);
 
   });

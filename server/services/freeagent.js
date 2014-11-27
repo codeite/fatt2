@@ -111,7 +111,7 @@ module.exports = function (config) {
   };
 
   var replaceRemoteWithLocal = function (body) {
-    var regex = new RegExp(config.freeagentApi, 'g');
+    var regex = new RegExp(config.freeagent.apiUrl, 'g');
     //console.log('replacing', regex, config.siteName+"/freeagent")
 
     return (body + "").replace(regex, config.siteName + "/freeagent");

@@ -1,4 +1,4 @@
-module.exports = function (config) {
+module.exports = function (path, config) {
   'use strict';
 
   var express = require('express'),
@@ -24,7 +24,7 @@ module.exports = function (config) {
   };
 
   router.get('/*', function (req, res) {
-    var url = buildUrl(config.freeagentApi, req.path, req.query);
+    var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
     console.log("GET: " + url);
 
     var authToken = req.cookies[authCookieName];
@@ -32,9 +32,10 @@ module.exports = function (config) {
 
     freeagent.apiGet(authToken, url,
       function (error, response, body) {
-        //if (!error && response.statusCode == 200) {
-        //console.log('body', body)
-        //}
+        if (error || response.statusCode !== 200) {
+          console.log('Error calling freeagent', error);
+          return;
+        }
         res.set('link', response.headers.link || '');
         res.send(body);
       }
@@ -42,7 +43,7 @@ module.exports = function (config) {
   });
 
   router.post('/*', function (req, res) {
-    var url = buildUrl(config.freeagentApi, req.path, req.query);
+    var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
     console.log("POST: " + url);
 
     var authToken = req.cookies[authCookieName];
@@ -61,7 +62,7 @@ module.exports = function (config) {
   });
 
   router.delete('/*', function (req, res) {
-    var url = buildUrl(config.freeagentApi, req.path, req.query);
+    var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
     console.log("DELETE: " + url);
 
     var authToken = req.cookies[authCookieName];

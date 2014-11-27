@@ -1,4 +1,4 @@
-module.exports = function (config){
+module.exports = function (path, config){
   'use strict';
   var express = require('express');
   var router = express.Router();
@@ -7,17 +7,19 @@ module.exports = function (config){
 
   var state = Math.random()+"fth";
 
+  var callbackUrl = config.siteName + path + "/callback";
+
   var oauth2 = require('simple-oauth2')({
-    clientID: config.googleClientId,
-    clientSecret: config.googleClientSecret,
-    site: config.googleApi,
+    clientID: config.google.clientId,
+    clientSecret: config.google.clientSecret,
+    site: config.google.apiUrl,
     authorizationPath: '/auth',
     tokenPath: '/token',
   });
 
   // Authorization uri definition
   var authorizationUri = oauth2.authCode.authorizeURL({
-    'redirect_uri': config.googleCallbackUrl,
+    'redirect_uri': callbackUrl,
     'scope': 'openid email',
     'state': state
   });
@@ -66,7 +68,7 @@ module.exports = function (config){
 
     oauth2.authCode.getToken({
       'code': code,
-      'redirect_uri': config.googleCallbackUrl
+      'redirect_uri': callbackUrl
     }, saveToken);
 
   });
@@ -78,17 +80,3 @@ module.exports = function (config){
 
   return router;
 };
-/*
-
-
-
-
-
-
-
-
-
-
-
-
-*/

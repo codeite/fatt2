@@ -14,17 +14,19 @@ module.exports = (function (){
 
     mongodbUrl : (process.env.MONGO_DB_URL || "mongodb://fatt-website:LlQHuBH6gAnzHdj@ds033170.mongolab.com:33170/fatt"),
 
-    fattClientId: (process.env.FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g"),
-    fattClientSecret: (process.env.FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw"),
-    freeagentApi: (process.env.FREEAGENT_API || "https://api.sandbox.freeagent.com/v2"),
+    freeagent: {
+      fattClientId: (process.env.FREEAGENT_FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g"),
+      fattClientSecret: (process.env.FREEAGENR_FATT_CLIENT_SECRET || "4OdDfW36ONBQug4Y2_3lDw"),
+      apiUrl: (process.env.FREEAGENT_API_URL || "https://api.sandbox.freeagent.com/v2"),
+    },
 
-    googleClientId: (process.env.GOOGLE_CLIENT_ID || "121875671159-tggl2f47e171usdatcn4fnpeabkc6f76.apps.googleusercontent.com"),
-    googleClientSecret: (process.env.GOOGLE_CLIENT_SECRET || "TEW03Pw8qcWFXwy0qIAFHWdy"),
-    googleApi: (process.env.GOOGLE_API || "https://accounts.google.com/o/oauth2"),
+    google: {
+      clientId: (process.env.GOOGLE_CLIENT_ID || "121875671159-tggl2f47e171usdatcn4fnpeabkc6f76.apps.googleusercontent.com"),
+      clientSecret: (process.env.GOOGLE_CLIENT_SECRET || "TEW03Pw8qcWFXwy0qIAFHWdy"),
+      apiUrl: (process.env.GOOGLE_API_URL || "https://accounts.google.com/o/oauth2")
+    },
 
     siteName: (process.env.SITE_NAME || "http://localhost:4848"),
-    callbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/auth/callback"),
-    googleCallbackUrl: (process.env.CALLBACK_URL || "http://localhost:4848/google/callback"),
     cache: myCache
 
   };
@@ -54,12 +56,17 @@ module.exports = (function (){
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, '../public')));
 
+  function registerRoute(path, script) {
+    app.use(path, require('./routes/'+script)(path, config));
+  }
+
   // Routes
-  app.use('/', require('./routes/index'));
-  app.use('/users', require('./routes/users'));
-  app.use('/freeagent', require('./routes/freeagentRoutes')(config));
-  app.use('/auth', require('./routes/faAuth')(config));
-  app.use('/google', require('./routes/googleAuth')(config));
+  registerRoute('/',            'index');
+  registerRoute('/users',       'users');
+  registerRoute('/freeagent',   'freeagentRoutes');
+  registerRoute('/faauth',      'faAuth');
+  registerRoute('/googleauth',  'googleAuth');
+
 
   // catch 404 and forward to error handler
   app.use(function(req, res, next) {

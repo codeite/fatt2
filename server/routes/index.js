@@ -1,4 +1,4 @@
-module.exports = (function (){
+module.exports = function (path, config){
   'use strict';
   var express = require('express');
   var router = express.Router();
@@ -9,4 +9,4 @@ module.exports = (function (){
   });
 
   return router;
-})();
+};
