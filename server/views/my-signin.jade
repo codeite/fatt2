@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  script(src="https://apis.google.com/js/client:platform.js" async defer)
+  
+  div(ng-controller='MainCtrl')
+    h1 Sign in to Fatt
+    p Sign in with social network
+    
+    span#signinButton
+     span.g-signin(
+      data-callback="signinCallback"
+      data-clientid="CLIENT_ID"
+      data-cookiepolicy="single_host_origin"
+      data-requestvisibleactions="http://schema.org/AddAction"
+      data-scope="https://www.googleapis.com/auth/plus.login")
+
+    
+    hr
+    p Sign in with email
+    lable
+      p Email Address
+      input
+    lable
+      p Password
+      input
+ 
+    

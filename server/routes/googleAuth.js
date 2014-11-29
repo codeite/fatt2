@@ -3,6 +3,7 @@ module.exports = function (path, config){
   var express = require('express');
   var router = express.Router();
 
+  var authauth = require('../services/authauth')(config);
   var storage = require('../services/storage')(config);
 
   var state = Math.random()+"fth";
@@ -57,11 +58,12 @@ module.exports = function (path, config){
       var payload = JSON.parse(base64urlDecode(bits[1]));
       console.log(payload); //=> { foo: 'bar' }
 
-
-
       storage.saveUser(payload.email, token.token[accessTokenKey], payload, function (err, result){
         //res.send(JSON.stringify(payload));
-        res.send("Done and saved");
+        var token = authauth.generateToken(payload.email);
+        console.log('token', token);
+        res.cookie('authauth', token, { maxAge: 900000, httpOnly: true });
+        res.redirect('/sign');
       });
       //res.redirect('/');
     }

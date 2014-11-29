@@ -27,6 +27,7 @@ module.exports = (function (){
     },
 
     siteName: (process.env.SITE_NAME || "http://localhost:4848"),
+    secret: "this is a secret",
     cache: myCache
 
   };
@@ -66,6 +67,7 @@ module.exports = (function (){
   registerRoute('/freeagent',   'freeagentRoutes');
   registerRoute('/faauth',      'faAuth');
   registerRoute('/googleauth',  'googleAuth');
+  registerRoute('/sign',        'sign');
 
 
   // catch 404 and forward to error handler
