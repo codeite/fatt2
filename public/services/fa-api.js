@@ -1,5 +1,6 @@
 angular.module("fatt")
   .factory("faApi", ["$http", function($http) {
+    'use strict';
     var database = {};
 
     var getMe = function(callback) {
@@ -10,22 +11,22 @@ angular.module("fatt")
       getAndCache('/freeagent/projects?view=active', null, callback);
     };
 
-    function resolveProject(projectUrl, callback) {
+    var resolveProject = function (projectUrl, callback) {
       getAndCache(projectUrl, "project", callback);
     };
 
-    function resolveTask(taskUrl, callback) {
+    var resolveTask = function (taskUrl, callback) {
       getAndCache(taskUrl, "task", callback);
-    }
+    };
 
-    function resolveContact(contactUrl, callback) {
+    var resolveContact = function (contactUrl, callback) {
       getAndCache(contactUrl, "contact", callback);
-    }
+    };
 
-    function readTimeslips(from_date, to_date, callback) {
-    	var url = '/freeagent/timeslips?from_date='+from_date+'&to_date='+to_date;
+    var readTimeslips = function (fromDate, toDate, callback) {
+    	var url = '/freeagent/timeslips?from_date='+fromDate+'&to_date='+toDate;
       readList(url, callback, 'timeslips');
-    }
+    };
 
     function readList(url, callback, propertyName, progress) {
       $http.get(url).success(function(data, status, headers) {
@@ -35,7 +36,7 @@ angular.module("fatt")
           progress = data;
         }
 
-        var links = readLinks(headers())
+        var links = readLinks(headers());
 
         if(links.next) {
           readList(links.next, callback, propertyName, progress);
@@ -48,8 +49,8 @@ angular.module("fatt")
     }
 
     var readLinks = function(headers) {
-      if(!headers.link || headers.link == ""){
-        return {}
+      if(!headers.link || headers.link === "") {
+        return {};
       }
 
       var bits = headers.link.split(',');
@@ -63,10 +64,10 @@ angular.module("fatt")
       }, {});
 
       return res;
-    }
+    };
 
     var getAndCache = function(url, transform, callback) {
-      if(typeof(callback) != "function") {
+      if(typeof(callback) !== "function") {
         callback = function(){};
       }
 
@@ -74,31 +75,41 @@ angular.module("fatt")
 
       if(Array.isArray(value)) {
         value.push(callback);
-      } else if (typeof(value) == 'object') {
+      } else if (typeof(value) === 'object') {
         callback(value);
       } else {
-        database[url] = []
+        database[url] = [];
         database[url].push(callback);
 
-        $http.get(url).success(function(data){
-          var callbacks = database[url];
+        console.log('Requesting: ', url);
+        $http.get(url)
+          .success(function (data) {
+            console.log('Success: ', url);
+            var callbacks = database[url];
 
-          var result;
-          if(transform == null) {
-            result = data;
-          } else  if(typeof(transform) == 'function'){
-            result = transform(data);
-          } else {
-            result = data[transform]
-          }
+            var result;
+            if(transform === null) {
+              result = data;
+            } else  if(typeof(transform) === 'function'){
+              result = transform(data);
+            } else {
+              result = data[transform];
+            }
 
-          database[url] = result;
+            database[url] = result;
 
-          for(var idx=0; idx<callbacks.length; idx++){
-            var callback = callbacks[idx];
-            callback(result);
-          }
-        });
+            for(var idx=0; idx<callbacks.length; idx++){
+              var callback = callbacks[idx];
+              callback(result);
+            }
+          }).error(function (data, status, error, config) {
+            console.error('Fail: ', url);
+            console.error(status);
+
+            if(status === 401) {
+              window.location = '/faauth';
+            }
+          }).then(function (){console.log('then');});
       }
     };
 
@@ -111,4 +122,4 @@ angular.module("fatt")
       readTimeslips: readTimeslips
 
     };
-  }])
+  }]);

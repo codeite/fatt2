@@ -20,6 +20,10 @@ module.exports = function (config) {
 
 
   var verifyToken = function (token) {
+    if(typeof(token !== 'string') || token === "" || token.indexOf(':') === -1) {
+      return null;
+    }
+
     var bits = token.split(':');
 
     var unsignedToken = bits[0];

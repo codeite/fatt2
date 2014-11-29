@@ -1,8 +1,6 @@
 module.exports = function (config) {
   'use strict';
-  var request = require('request'),
-    fs = require('fs'),
-    path = require('path');
+  var request = require('request');
 
   var apiGet = function (authToken, url, callback) {
     var cachedResponse = config.cache.get(url)[url];
@@ -30,41 +28,23 @@ module.exports = function (config) {
     };
 
     var getCallback = function (error, response, body) {
-      if (error) {
-        var jsonFile = "";
-        if (url.indexOf('/v2/timeslips') !== -1) {
-          jsonFile = 'timeslips.json';
-        } else if (url.indexOf('/v2/projects') !== -1) {
-          jsonFile = 'projects.json';
-        } else {
-          console.log('Cant find a file for ' + url);
-        }
 
-        var pathToJson = path.join(__dirname, '../data',
-          jsonFile);
-        console.log(pathToJson);
-
-        fs.readFile(pathToJson, function (error, data) {
-          callback(error, response,
-            replaceRemoteWithLocal(data)
-          );
+      if (response.statusCode === 200) {
+        config.cache.set(url, {
+          etag: response.headers.etag,
+          response: response,
+          body: body
         });
+
+        whenDone(error, response, body, callback);
+      } else if (response.statusCode === 304) {
+        console.log("Using cached response");
+        whenDone(null, cachedResponse.response,
+          cachedResponse.body, callback);
       } else {
-
-        if (response.statusCode === 200) {
-          config.cache.set(url, {
-            etag: response.headers.etag,
-            response: response,
-            body: body
-          });
-
-          whenDone(error, response, body, callback);
-        } else if (response.statusCode === 304) {
-          console.log("Using cached response");
-          whenDone(null, cachedResponse.response,
-            cachedResponse.body, callback);
-        }
+        whenDone(error, response, body, callback);
       }
+
     };
 
     request.get(url, { headers: headers }, getCallback);

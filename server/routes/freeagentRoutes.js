@@ -34,6 +34,8 @@ module.exports = function (path, config) {
       function (error, response, body) {
         if (error || response.statusCode !== 200) {
           console.log('Error calling freeagent', error);
+          res.status(response.statusCode);
+          res.end();
           return;
         }
         res.set('link', response.headers.link || '');

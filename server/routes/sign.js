@@ -6,8 +6,14 @@ module.exports = function (path, config){
 
   router.get('/', function (req, res) {
 
-    res.end(authauth.verifyToken(req.cookies.authauth));
-    //res.redirect(path+'/in');
+    var user = authauth.verifyToken(req.cookies.authauth);
+
+    if(user !== "") {
+      res.redirect('/');
+    } else {
+      res.redirect(path+'/in');
+    }
+
   });
 
   /* GET home page. */
