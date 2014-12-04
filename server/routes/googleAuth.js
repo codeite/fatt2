@@ -62,7 +62,7 @@ module.exports = function (path, config){
         //res.send(JSON.stringify(payload));
         var token = authauth.generateToken(payload.email);
         console.log('token', token);
-        res.cookie('authauth', token, { maxAge: 900000, httpOnly: true });
+        res.cookie('authauth', token, { maxAge: 604800000, httpOnly: true });
         res.redirect('/sign');
       });
       //res.redirect('/');

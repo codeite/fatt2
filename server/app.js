@@ -12,7 +12,8 @@ module.exports = (function (){
   var config = {
     port: (process.env.PORT || 4848),
 
-    mongodbUrl : (process.env.MONGO_DB_URL || "mongodb://fatt-website:LlQHuBH6gAnzHdj@ds033170.mongolab.com:33170/fatt"),
+    //mongodbUrl : (process.env.MONGO_DB_URL || "mongodb://fatt-website:LlQHuBH6gAnzHdj@ds033170.mongolab.com:33170/fatt"),
+    mongodbUrl : (process.env.MONGO_DB_URL || "mongodb://localhost/fatt"),
 
     freeagent: {
       fattClientId: (process.env.FREEAGENT_FATT_CLIENT_ID || "ZnVY2G0fN-ZzL0-XBi7L_g"),
@@ -31,6 +32,8 @@ module.exports = (function (){
     cache: myCache
 
   };
+
+  var readUser = require('./middleware/readUser.js')(config);
 
   var app = express();
 
@@ -56,6 +59,7 @@ module.exports = (function (){
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, '../public')));
+  app.use(readUser);
 
   function registerRoute(path, script) {
     app.use(path, require('./routes/'+script)(path, config));

@@ -2,11 +2,11 @@ module.exports = function (path, config){
   'use strict';
   var express = require('express');
   var router = express.Router();
-  var authauth = require('../services/authauth')(config);
+
 
   router.get('/', function (req, res) {
 
-    var user = authauth.verifyToken(req.cookies.authauth);
+    var user = req.user || "";
 
     if(user !== "") {
       res.redirect('/');

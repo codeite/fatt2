@@ -20,7 +20,9 @@ module.exports = function (config) {
 
 
   var verifyToken = function (token) {
-    if(typeof(token !== 'string') || token === "" || token.indexOf(':') === -1) {
+
+    if(typeof(token) !== 'string' || token === "" || token.indexOf(':') === -1) {
+      console.error('verifyToken failed precheck');
       return null;
     }
 
@@ -34,6 +36,7 @@ module.exports = function (config) {
     if(expectedSig === sig) {
       return  unsignedToken.split(';')[1];
     } else {
+      console.log("Token invalid");
       return null;
     }
   };

@@ -3,9 +3,17 @@ module.exports = function (path, config) {
 
   var express = require('express'),
     router = express.Router(),
-    freeagent = require('../services/freeagent')(config);
+    freeagent = require('../services/freeagent')(config),
+    storage = require('../services/storage')(config);
 
   var authCookieName = "access_token";
+
+  var getToken = function (req, callback) {
+
+    storage.getUserToken(req.user, function(token) {
+      callback(token || req.cookies[authCookieName]);
+    });
+  };
 
   var buildUrl = function (apiRoot, path, query){
     var url = apiRoot + path;
@@ -27,57 +35,60 @@ module.exports = function (path, config) {
     var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
     console.log("GET: " + url);
 
-    var authToken = req.cookies[authCookieName];
-    console.log("Auth: " + authToken);
+    getToken(req, function(authToken) {
+      console.log("Auth: " + authToken);
 
-    freeagent.apiGet(authToken, url,
-      function (error, response, body) {
-        if (error || response.statusCode !== 200) {
-          console.log('Error calling freeagent', error);
-          res.status(response.statusCode);
-          res.end();
-          return;
+      freeagent.apiGet(authToken, url,
+        function (error, response, body) {
+          if (error || response.statusCode !== 200) {
+            console.log('Error calling freeagent', error);
+            res.status(response.statusCode);
+            res.end();
+            return;
+          }
+          res.set('link', response.headers.link || '');
+          res.send(body);
         }
-        res.set('link', response.headers.link || '');
-        res.send(body);
-      }
-    );
+      );
+    });
   });
 
   router.post('/*', function (req, res) {
     var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
     console.log("POST: " + url);
 
-    var authToken = req.cookies[authCookieName];
-    console.log("Auth: " + authToken);
+    getToken(req, function(authToken) {
+      console.log("Auth: " + authToken);
 
-    console.log(req.body);
+      console.log(req.body);
 
-    freeagent.apiPost(authToken, url, JSON.stringify(req.body),
-      function (error, response, body) {
-        //if (!error && response.statusCode == 200) {
-        //console.log('body', body)
-        //}
-        res.send("");
-      }
-    );
+      freeagent.apiPost(authToken, url, JSON.stringify(req.body),
+        function (error, response, body) {
+          //if (!error && response.statusCode == 200) {
+          //console.log('body', body)
+          //}
+          res.send("");
+        }
+      );
+    });
   });
 
   router.delete('/*', function (req, res) {
     var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
     console.log("DELETE: " + url);
 
-    var authToken = req.cookies[authCookieName];
-    console.log("Auth: " + authToken);
+    getToken(req, function(authToken) {
+      console.log("Auth: " + authToken);
 
-    freeagent.apiDelete(authToken, url,
-      function (error, response, body) {
-        //if (!error && response.statusCode == 200) {
-        //console.log('body', body)
-        //}
-        res.send("");
-      }
-    );
+      freeagent.apiDelete(authToken, url,
+        function (error, response, body) {
+          //if (!error && response.statusCode == 200) {
+          //console.log('body', body)
+          //}
+          res.send("");
+        }
+      );
+    });
   });
 
   return router;

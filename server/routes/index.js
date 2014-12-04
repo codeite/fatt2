@@ -2,13 +2,12 @@ module.exports = function (path, config){
   'use strict';
   var express = require('express');
   var router = express.Router();
-  var authauth = require('../services/authauth')(config);
+  var demand = require('../middleware/demand')(config);
 
-  router.get('/', function (req, res) {
 
-    var user = authauth.verifyToken(req.cookies.authauth);
+  router.get('/', demand("fa"), function (req, res) {
 
-    if(user === "") {
+    if(req.user === "") {
       console.log ("At: / User is not logged in");
       res.redirect('/sign');
     } else {
@@ -20,7 +19,10 @@ module.exports = function (path, config){
   });
 
   /* GET home page. */
-  router.get('/month', function(req, res) {
+  router.get('/month', demand("fa"), function(req, res) {
+
+
+
     res.render('month');
   });
 

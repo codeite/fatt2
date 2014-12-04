@@ -2,6 +2,7 @@ module.exports = function (path, config){
   'use strict';
   var express = require('express');
   var router = express.Router();
+  var storage = require('../services/storage')(config);
 
   var callbackUrl = config.siteName + path + "/callback";
 
@@ -29,15 +30,21 @@ module.exports = function (path, config){
 
     function saveToken(error, result) {
       var accessTokenKey = 'access_token';
-      var refreshTokenKey = 'refresh_token';
+      //var refreshTokenKey = 'refresh_token';
 
       if (error) { console.log('Access Token Error', error); res.send("Failed"); return; }
       console.log(result);
       var token = oauth2.accessToken.create(result);
       console.log(token);
-      res.cookie(accessTokenKey, token.token[accessTokenKey], { maxAge: 604800000, path: '/' });
-      res.cookie(refreshTokenKey, token.token[refreshTokenKey], { maxAge: 604800000, path: '/' });
-      res.redirect('/');
+
+
+      if(req.user) {
+        storage.setUserToken(req.user, token.token[accessTokenKey], function(){
+          res.redirect('/');
+        });
+      } else {
+        res.cookie(accessTokenKey, token.token[accessTokenKey], { maxAge: 604800000, path: '/' });
+      }
     }
 
     oauth2.authCode.getToken({
@@ -49,7 +56,23 @@ module.exports = function (path, config){
 
   /* GET users listing. */
   router.get('/', function(req, res) {
-    res.redirect(authorizationUri);
+    if(req.user) {
+      res.redirect(authorizationUri);
+    } else {
+      res.redirect('/sign');
+    }
+  });
+
+  router.get('/token', function(req, res) {
+
+    if(!req.user){
+      res.send("Not logged in");
+      return;
+    }
+
+    storage.getUserToken(req.user, function(token){
+      res.send('Here would be the token: ' + token);
+    });
   });
 
   return router;
