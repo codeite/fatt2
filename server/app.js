@@ -28,7 +28,7 @@ module.exports = (function (){
     },
 
     siteName: (process.env.SITE_NAME || "http://localhost:4848"),
-    secret: "this is a secret",
+    secret: (process.env.SECRECT || "this is a secret"),
     cache: myCache
 
   };
