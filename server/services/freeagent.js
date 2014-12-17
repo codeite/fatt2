@@ -6,7 +6,9 @@ module.exports = function (context, scope) {
   var request = require('request');
 
   var apiGet = function (authToken, url, callback) {
-    var cachedResponse = cache.get(url)[url];
+    var cacheKey = authToken+'-'+url;
+    console.log("Looking in cache for:", cacheKey);
+    var cachedResponse = cache.get(cacheKey)[cacheKey];
 
     var headers = {
       'Accept': 'application/json',
@@ -36,7 +38,12 @@ module.exports = function (context, scope) {
       }
 
       if (response.statusCode === 200) {
-        cache.set(url, {
+        if(cachedResponse) {
+          console.log("Junking cached response");
+        }
+
+        console.log("Setting cache value: ", cacheKey);
+        cache.set(cacheKey, {
           etag: response.headers.etag,
           response: response,
           body: body
