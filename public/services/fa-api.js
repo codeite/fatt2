@@ -7,6 +7,10 @@ angular.module("fatt")
       getAndCache('/freeagent/users/me', "user", callback);
     };
 
+    var getCompany = function(callback) {
+      getAndCache('/freeagent/company', "company", callback);
+    };
+
     var getActiveProjects = function(callback) {
       getAndCache('/freeagent/projects?view=active', null, callback);
     };
@@ -115,6 +119,7 @@ angular.module("fatt")
 
     return {
       getMe : getMe,
+      getCompany: getCompany,
       getActiveProjects : getActiveProjects,
       resolveProject: resolveProject,
       resolveTask: resolveTask,

@@ -8,6 +8,11 @@ angular.module('fatt')
       $scope.me = foundMe;
     });
 
+    faApi.getCompany(function(foundCompany) {
+      $scope.company = foundCompany;
+    });
+
+
     $scope.modalShown = false;
     $scope.commonRecords = commonRecords;
 

@@ -31,6 +31,9 @@ module.exports = function (context, scope) {
     };
 
     var getCallback = function (error, response, body) {
+      if(error) {
+        throw error;
+      }
 
       if (response.statusCode === 200) {
         cache.set(url, {
