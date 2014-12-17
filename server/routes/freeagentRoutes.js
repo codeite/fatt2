@@ -1,10 +1,11 @@
-module.exports = function (path, config) {
+module.exports = function (path, context) {
   'use strict';
+  var config = context.config;
 
   var express = require('express'),
     router = express.Router(),
-    freeagent = require('../services/freeagent')(config),
-    storage = require('../services/storage')(config);
+    freeagent = require('../services/freeagent')(context),
+    storage = require('../services/storage')(context);
 
   var authCookieName = "access_token";
 

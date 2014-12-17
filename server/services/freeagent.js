@@ -1,9 +1,12 @@
-module.exports = function (config) {
+module.exports = function (context, scope) {
   'use strict';
+  var config = context.config;
+  var cache = context.cache;
+
   var request = require('request');
 
   var apiGet = function (authToken, url, callback) {
-    var cachedResponse = config.cache.get(url)[url];
+    var cachedResponse = cache.get(url)[url];
 
     var headers = {
       'Accept': 'application/json',
@@ -30,7 +33,7 @@ module.exports = function (config) {
     var getCallback = function (error, response, body) {
 
       if (response.statusCode === 200) {
-        config.cache.set(url, {
+        cache.set(url, {
           etag: response.headers.etag,
           response: response,
           body: body

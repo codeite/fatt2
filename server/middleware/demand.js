@@ -1,7 +1,7 @@
-module.exports = function (config) {
+module.exports = function (context) {
   'use strict';
 
-  var storage = require('../services/storage')(config);
+  var storage = require('../services/storage')(context);
 
   var makeResourcesArray = function(resources) {
     if(Array.isArray(resources)){

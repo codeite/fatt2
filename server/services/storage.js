@@ -1,5 +1,6 @@
-module.exports = function (config) {
+module.exports = function (context) {
   'use strict';
+  var config = context.config;
   var MongoClient = require('mongodb').MongoClient;
 
   var throwError = function(err) {

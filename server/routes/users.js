@@ -1,5 +1,6 @@
-module.exports = function (path, config){
+module.exports = function (path, context) {
   'use strict';
+
   var express = require('express');
   var router = express.Router();
 

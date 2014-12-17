@@ -1,8 +1,9 @@
-module.exports = function (path, config){
+module.exports = function (path, context) {
   'use strict';
+  var config = context.config;
   var express = require('express');
   var router = express.Router();
-  var storage = require('../services/storage')(config);
+  var storage = require('../services/storage')(context);
 
   var callbackUrl = config.siteName + path + "/callback";
 

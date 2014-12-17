@@ -1,8 +1,8 @@
-module.exports = function (path, config){
+module.exports = function (path, context) {
   'use strict';
   var express = require('express');
   var router = express.Router();
-  var demand = require('../middleware/demand')(config);
+  var demand = require('../middleware/demand')(context);
 
 
   router.get('/', demand("fa"), function (req, res) {

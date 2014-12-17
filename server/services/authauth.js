@@ -1,6 +1,6 @@
-module.exports = function (config) {
+module.exports = function (context) {
   'use strict';
-
+  var config = context.config;
   var crypto = require('crypto');
 
   var generateToken = function (email) {

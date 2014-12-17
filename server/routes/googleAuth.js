@@ -1,10 +1,12 @@
-module.exports = function (path, config){
+module.exports = function (path, context) {
   'use strict';
+  var config = context.config;
+
   var express = require('express');
   var router = express.Router();
 
-  var authauth = require('../services/authauth')(config);
-  var storage = require('../services/storage')(config);
+  var authauth = require('../services/authauth')(context);
+  var storage = require('../services/storage')(context);
 
   var state = Math.random()+"fth";
 
