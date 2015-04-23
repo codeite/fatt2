@@ -26,5 +26,17 @@ module.exports = function (path, context) {
     res.render('month');
   });
 
+  router.get('/yourfreeagent/:subdomain', demand("fa"), function(req, res) {
+    
+    var url =  'https://'+req.params.subdomain;
+    if(context.config.freeagent.apiUrl.indexOf('.sandbox.') > -1) {
+      url += '.sandbox';
+    }
+    url += '.freeagent.com';
+
+    res.redirect(url);
+
+  });
+
   return router;
 };
