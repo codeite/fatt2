@@ -85,7 +85,7 @@ angular.module("fatt")
         database[url] = [];
         database[url].push(callback);
 
-        console.log('Requesting: ', url);
+        //console.log('Requesting: ', url);
         $http.get(url)
           .success(function (data) {
             console.log('Success: ', url);

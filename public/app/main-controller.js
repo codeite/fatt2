@@ -30,6 +30,11 @@ angular.module('fatt')
       readTimeslips(result.firstDay, result.lastDay);
     }
 
+    function loadDay(day) {
+      var d = moment(day);
+      readTimeslips(d, d);
+    }
+
     loadPage();
 
     $scope.prevMonth = function() {
@@ -44,18 +49,19 @@ angular.module('fatt')
 
 
 
-    function deleteTimeslip(timeslipUrl) {
+    function deleteTimeslip(timeslipUrl, date) {
       $http.delete(timeslipUrl).success( function(data) {
-        loadPage();
+        //loadPage();
+        loadDay(date);
       });
     }
 
     function addRecordLike(day, record) {
       faApi.getMe(function(me){
 
-        console.log(me);
-        console.log(day);
-        console.log(record);
+        //console.log(me);
+        //console.log(day);
+        //console.log(record);
 
         var timeslip = {
           timeslip: {
@@ -67,9 +73,10 @@ angular.module('fatt')
           }
         };
 
-        console.log(timeslip);
+        //console.log('timeslip', timeslip);
         $http.post('/freeagent/timeslips', timeslip).success( function(data) {
-          loadPage();
+          //loadPage();
+          loadDay(day.name);
         });
       });
     }
@@ -116,13 +123,18 @@ angular.module('fatt')
     function readTimeslips(firstDay, lastDay) {
       faApi.readTimeslips(firstDay.format(monthCalculator.faDateFormat), lastDay.format(monthCalculator.faDateFormat), function(data) {
 
-        console.log("Done reading timeslips");
+        //console.log("Done reading timeslips");
         var idx;
 
         for(idx in database) { if (database.hasOwnProperty(idx)) {
           var day = database[idx];
-          day.records = [];
-          day.total = 0;
+
+          if (day.date.format('L') >= firstDay.format('L')
+            && day.date.format('L') <= lastDay.format('L')) {
+            console.log('day', day.date);
+            day.records = [];
+            day.total = 0;
+          }
         }}
 
         for(idx in data.timeslips) { if (data.timeslips.hasOwnProperty(idx)) {
@@ -145,9 +157,10 @@ angular.module('fatt')
               hours: +timeslip.hours,
               useCount: 0,
               delete: (function () {
+                var date = obj.date;
                 return function () {
-                  if(confirm("Delete this?")) {
-                    deleteTimeslip(this.timeslipUrl);
+                  if(true || confirm("Delete this?")) {
+                    deleteTimeslip(this.timeslipUrl, date);
                   }
                 };
               })()
@@ -178,7 +191,7 @@ angular.module('fatt')
               }
             }
 
-            if(day.date < today && day.date.isoWeekday() < 6){
+            if(day.date <= today && day.date.isoWeekday() < 6){
 
             if(day.total < requiredHours) {
               day.status = 'danger';
