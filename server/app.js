@@ -55,6 +55,7 @@ module.exports = (function (){
   registerRoute('/faauth',      'faAuth');
   registerRoute('/googleauth',  'googleAuth');
   registerRoute('/sign',        'sign');
+  registerRoute('/data',        'data');
 
 
   // catch 404 and forward to error handler

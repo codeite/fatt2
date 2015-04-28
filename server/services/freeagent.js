@@ -4,8 +4,26 @@ module.exports = function (context, scope) {
   var cache = context.cache;
 
   var request = require('request');
+  var Q = require('q');
 
   var apiGet = function (authToken, url, callback) {
+    var deferred = null;
+
+    if(callback === undefined) {
+      deferred = Q.defer();
+      callback = function(error, response, body) {
+        if (error) {
+          deferred.reject(error);
+        } else {
+          deferred.resolve({
+            authToken: authToken,
+            response: response,
+            body: body
+          });
+        }
+      }
+    }
+
     var cacheKey = authToken+'-'+url;
     console.log("Looking in cache for:", cacheKey);
     var cachedResponse = cache.get(cacheKey)[cacheKey];
@@ -61,6 +79,7 @@ module.exports = function (context, scope) {
     };
 
     request.get(url, { headers: headers }, getCallback);
+    return deferred && deferred.promise;
   };
 
   var apiPost = function (authToken, url, body, callback) {
