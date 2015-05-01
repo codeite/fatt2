@@ -6,8 +6,19 @@ module.exports = function (context, scope) {
   var request = require('request');
   var Q = require('q');
 
-  var apiGet = function (authToken, url, callback) {
+  var apiGet = function (authToken, options, callback) {
     var deferred = null;
+    var url;
+
+    if(typeof(options) == 'string'){
+      options = {
+        url: options,
+        replaceWithLocal: true
+      };
+    }
+
+    url = options.url;
+
 
     if(callback === undefined) {
       deferred = Q.defer();
@@ -25,7 +36,7 @@ module.exports = function (context, scope) {
     }
 
     var cacheKey = authToken+'-'+url;
-    console.log("Looking in cache for:", cacheKey);
+    //console.log("Looking in cache for:", cacheKey);
     var cachedResponse = cache.get(cacheKey)[cacheKey];
 
     var headers = {
@@ -35,19 +46,24 @@ module.exports = function (context, scope) {
     };
 
     if (cachedResponse) {
-      console.log("Found this in the cache:", cachedResponse.etag);
+      //console.log("Found this in the cache:", cachedResponse.etag);
       headers['If-none-match'] = cachedResponse.etag;
     } else {
-      console.log("Not in cache");
+      //console.log("Not in cache");
     }
 
     var whenDone = function (error, response, body, callback) {
-      for (var key in response.headers) { if(response.headers.hasOwnProperty(key)) {
-        response.headers[key] = replaceRemoteWithLocal(
-        response.headers[key]);
-      }}
+      if(options.replaceWithLocal) {
+        for (var key in response.headers) {
+          if (response.headers.hasOwnProperty(key)) {
+            response.headers[key] = replaceRemoteWithLocal(
+              response.headers[key]);
+          }
+        }
+        body = replaceRemoteWithLocal(body);
+      }
 
-      callback(error, response, replaceRemoteWithLocal(body));
+      callback(error, response, body);
     };
 
     var getCallback = function (error, response, body) {
@@ -60,7 +76,7 @@ module.exports = function (context, scope) {
           console.log("Junking cached response");
         }
 
-        console.log("Setting cache value: ", cacheKey);
+        //console.log("Setting cache value: ", cacheKey);
         cache.set(cacheKey, {
           etag: response.headers.etag,
           response: response,
@@ -69,7 +85,7 @@ module.exports = function (context, scope) {
 
         whenDone(error, response, body, callback);
       } else if (response.statusCode === 304) {
-        console.log("Using cached response");
+        //console.log("Using cached response");
         whenDone(null, cachedResponse.response,
           cachedResponse.body, callback);
       } else {

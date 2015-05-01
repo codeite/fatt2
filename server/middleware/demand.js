@@ -47,11 +47,11 @@ module.exports = function (context) {
     return function(req, res, next) {
 
        var resourceArray = makeResourcesArray(resources);
-       console.log("Assessing demands array: ", resourceArray);
+       // console.log("Assessing demands array: ", resourceArray);
 
        function processor() {
         var resource = resourceArray.pop();
-        console.log("Assessing demand ", resource);
+        // console.log("Assessing demand ", resource);
 
         if(typeof(resource) === 'undefined') {
           console.log('All demands met');
