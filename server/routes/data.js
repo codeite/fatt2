@@ -14,6 +14,27 @@ module.exports = function (path, context) {
     freeagent = require('../services/freeagent')(context),
     storage = require('../services/storage')(context);
 
+  router.get('/:tyear-:tmonth-:tday.:ext?', demand("fa"), function (req, res) {
+    var to = req.params.tyear+'-'+req.params.tmonth+'-'+req.params.tday;
+    to = moment(to);
+    var from = to.clone().add(-1, 'month').add(1, 'day');
+
+    var availsDays = workingDays(from, to);
+
+    from = from.format('YYYY-MM-DD');
+    to = to.format('YYYY-MM-DD');
+
+    var state = {
+      availsDays: availsDays,
+      req: req,
+      res: res,
+      from: from,
+      to: to
+    };
+
+    calc(state);
+  });
+
   router.get('/:year.:ext?', demand("fa"), function (req, res) {
     var from = moment(req.params.year + '-04-06');
     var to = from.clone().add(1, 'year').add(-1, 'day');
@@ -38,27 +59,6 @@ module.exports = function (path, context) {
 
     calc(state);
 
-  });
-
-  router.get('/:tyear-:tmonth-:tday.:ext?', demand("fa"), function (req, res) {
-    var to = req.params.tyear+'-'+req.params.tmonth+'-'+req.params.tday;
-    to = moment(to);
-    var from = to.clone().add(-1, 'month').add(1, 'day');
-
-    var availsDays = workingDays(from, to);
-
-    from = from.format('YYYY-MM-DD');
-    to = to.format('YYYY-MM-DD');
-
-    var state = {
-      availsDays: availsDays,
-      req: req,
-      res: res,
-      from: from,
-      to: to
-    };
-
-    calc(state);
   });
 
   function workingDays(start, end) {
