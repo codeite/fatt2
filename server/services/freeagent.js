@@ -142,11 +142,11 @@ module.exports = function (context, scope) {
     var regex = new RegExp(config.freeagent.apiUrl, 'g');
     //console.log('replacing', regex, config.siteName+"/freeagent")
 
-    return (body + "").replace(regex, config.siteName + "/freeagent");
+    return (body + "").replace(regex, config.siteName + "/fatt/freeagent");
   };
 
   var replaceLocalWithRemote = function (body) {
-    var regex = new RegExp(config.siteName + "/freeagent", 'g');
+    var regex = new RegExp(config.siteName + "/fatt/freeagent", 'g');
     var replace = config.freeagentApi;
 
     //console.log('replacing', regex, replace)

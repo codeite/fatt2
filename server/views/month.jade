@@ -9,10 +9,10 @@ block content
     h2 Logged in as : {{me.first_name}} {{me.last_name}}
           p ({{me.email}})
           a(href="/yourfreeagent/{{company.subdomain}}") https://{{company.subdomain}}.freeagent.com
-    
 
-    p: a(href='/faauth') Login
-    p: a(href='/googleauth') Google
+
+    p: a(href='/fatt/faauth') Login
+    p: a(href='/fatt/googleauth') Google
     table.table.table-bordered(style="width: 100%")
       thead
         tr
@@ -57,11 +57,11 @@ block content
 
 
     script(src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.11.2/ui-bootstrap.js")
-    
+
     script(src="/app/fatt-app.js")
     script(src="/services/fa-api.js")
     script(src="/services/month.js")
     script(src="/app/main-controller.js")
-    
- 
-    
+
+
+

@@ -5,7 +5,7 @@ module.exports = function (path, context) {
   var router = express.Router();
   var storage = require('../services/storage')(context);
 
-  var callbackUrl = config.siteName + path + "/callback";
+  var callbackUrl = config.siteName + context.root + path + "/callback";
 
   var oauth2 = require('simple-oauth2')({
     clientID: config.freeagent.fattClientId,
@@ -41,10 +41,10 @@ module.exports = function (path, context) {
 
       if(req.user) {
         storage.setUserToken(req.user, token.token[accessTokenKey], function(){
-          res.redirect('/');
+          res.redirect(context.root);
         });
       } else {
-        res.cookie(accessTokenKey, token.token[accessTokenKey], { maxAge: 604800000, path: '/' });
+        res.cookie(accessTokenKey, token.token[accessTokenKey], { maxAge: 604800000, path: context.root });
       }
     }
 
@@ -60,7 +60,7 @@ module.exports = function (path, context) {
     if(req.user) {
       res.redirect(authorizationUri);
     } else {
-      res.redirect('/sign');
+      res.redirect( context.root + 'sign');
     }
   });
 

@@ -17,19 +17,12 @@ module.exports = (function (){
   };
 
   var readUser = require('./middleware/readUser.js')(context);
+  var rootRoute = require('./routes/root.js');
 
   var app = express();
 
   app.set('port', config.port);
   app.use(cookieParser());
-
-  app.get('/config', function(req, res) {
-    res.send(JSON.stringify(config));
-  });
-
-  app.get('/add-ts', function(req, res) {
-    res.render('add-ts');
-  });
 
   // view engine setup
   app.set('views', path.join(__dirname, 'views'));
@@ -42,20 +35,9 @@ module.exports = (function (){
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use(express.static(path.join(__dirname, '../public')));
-  app.use(readUser);
 
-  function registerRoute(path, script) {
-    app.use(path, require('./routes/'+script)(path, context));
-  }
-
-  // Routes
-  registerRoute('/',            'index');
-  registerRoute('/users',       'users');
-  registerRoute('/freeagent',   'freeagentRoutes');
-  registerRoute('/faauth',      'faAuth');
-  registerRoute('/googleauth',  'googleAuth');
-  registerRoute('/sign',        'sign');
-  registerRoute('/data',        'data');
+  // app.use('/', rootRoute(Object.assign({}, context, {root: '/'})));
+  app.use('/fatt', rootRoute(Object.assign({}, context, {root: '/fatt/'})));
 
 
   // catch 404 and forward to error handler

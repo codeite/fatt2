@@ -4,15 +4,15 @@ angular.module("fatt")
     var database = {};
 
     var getMe = function(callback) {
-      getAndCache('/freeagent/users/me', "user", callback);
+      getAndCache('/fatt/freeagent/users/me', "user", callback);
     };
 
     var getCompany = function(callback) {
-      getAndCache('/freeagent/company', "company", callback);
+      getAndCache('/fatt/freeagent/company', "company", callback);
     };
 
     var getActiveProjects = function(callback) {
-      getAndCache('/freeagent/projects?view=active', null, callback);
+      getAndCache('/fatt/freeagent/projects?view=active', null, callback);
     };
 
     var resolveProject = function (projectUrl, callback) {
@@ -28,7 +28,7 @@ angular.module("fatt")
     };
 
     var readTimeslips = function (fromDate, toDate, callback) {
-    	var url = '/freeagent/timeslips?from_date='+fromDate+'&to_date='+toDate;
+    	var url = '/fatt/freeagent/timeslips?from_date='+fromDate+'&to_date='+toDate;
       readList(url, callback, 'timeslips');
     };
 
@@ -111,7 +111,7 @@ angular.module("fatt")
             console.error(status);
 
             if(status === 401) {
-              window.location = '/faauth';
+              window.location = '/fatt/faauth';
             }
           }).then(function (){console.log('then');});
       }

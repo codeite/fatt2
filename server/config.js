@@ -8,8 +8,10 @@ const config = {
   mongodbUrl : conf.readString('MONGO_DB_URL', {defaultValue: 'mongodb://localhost/fatt'}),
 
   freeagent: {
-    fattClientId: conf.readString('FREEAGENT_FATT_CLIENT_ID', 'ZnVY2G0fN-ZzL0-XBi7L_g'),
-    fattClientSecret: conf.readPassword('FREEAGENR_FATT_CLIENT_SECRET', '4OdDfW36ONBQug4Y2_3lDw'),
+    fattClientId: conf.readString('FREEAGENT_FATT_CLIENT_ID', 'TzcqWgPMA0Vsonbt1JU3jQ'),
+    //fattClientId: conf.readString('FREEAGENT_FATT_CLIENT_ID', 'ZnVY2G0fN-ZzL0-XBi7L_g'),
+    fattClientSecret: conf.readPassword('FREEAGENR_FATT_CLIENT_SECRET', 'HUkvRvmJVnmX9k7uN2JrXA'),
+    //fattClientSecret: conf.readPassword('FREEAGENR_FATT_CLIENT_SECRET', '4OdDfW36ONBQug4Y2_3lDw'),
     apiUrl: conf.readString('FREEAGENT_API_URL', 'https://api.sandbox.freeagent.com/v2'),
   },
 

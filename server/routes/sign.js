@@ -12,7 +12,7 @@ module.exports = function (path, context) {
     if(user !== "") {
       res.redirect('/');
     } else {
-      res.redirect(path+'/in');
+      res.redirect(req.originalUrl + '/in');
     }
 
   });

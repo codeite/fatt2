@@ -74,7 +74,7 @@ angular.module('fatt')
         };
 
         //console.log('timeslip', timeslip);
-        $http.post('/freeagent/timeslips', timeslip).success( function(data) {
+        $http.post('/fatt/freeagent/timeslips', timeslip).success( function(data) {
           //loadPage();
           loadDay(day.name);
         });

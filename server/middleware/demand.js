@@ -19,7 +19,7 @@ module.exports = function (context) {
 
         if(!token) {
           console.log("Error getting token for 'fa': Token is false ish: ", token);
-          res.redirect('/faauth');
+          res.redirect(context.root + 'faauth');
           return;
         }
 
@@ -30,8 +30,9 @@ module.exports = function (context) {
 
   var ae = function(req, res, next) {
     if(!req.user) {
-      console.log('Need to be authenticated, forwarding to /sign');
-      res.redirect('/sign');
+      var loginPath = context.root + 'sign'
+      console.log('Need to be authenticated, forwarding to', loginPath);
+      res.redirect(loginPath);
     } else {
       next();
     }

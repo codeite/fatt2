@@ -9,10 +9,10 @@ module.exports = function (path, context) {
 
     if(req.user === "") {
       console.log ("At: / User is not logged in");
-      res.redirect('/sign');
+      res.redirect(context.root + 'sign');
     } else {
       console.log ("At: / User is logged in");
-      res.redirect('/month');
+      res.redirect(context.root +'month');
     }
 
 
@@ -27,7 +27,7 @@ module.exports = function (path, context) {
   });
 
   router.get('/yourfreeagent/:subdomain', demand("fa"), function(req, res) {
-    
+
     var url =  'https://'+req.params.subdomain;
     if(context.config.freeagent.apiUrl.indexOf('.sandbox.') > -1) {
       url += '.sandbox';
