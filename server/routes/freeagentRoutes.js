@@ -12,7 +12,19 @@ module.exports = function (path, context) {
   var getToken = function (req, callback) {
 
     storage.getUserToken(req.user, function(token) {
-      callback(token || req.cookies[authCookieName]);
+      var now = Math.round((new Date()).getTime() / 1000)
+
+      if (token && token.expiresAt < now) {
+        return freeagent.refreshToken(req.user, token, function(newAccessToken) {
+          callback(newAccessToken);
+        })
+      }
+
+      if (token && token.expiresAt ) {
+        console.log('Token has seconds to live:', token.expiresAt - now, token.expiresAt, now)
+      }
+
+      callback(token.accessToken || req.cookies[authCookieName]);
     });
   };
 

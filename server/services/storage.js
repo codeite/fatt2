@@ -48,14 +48,20 @@ module.exports = function (context) {
     });
   };
 
-  var setUserToken = function (email, token, callback) {
+  var setUserToken = function (email, accessToken, expiresAt, refreshToken, callback) {
+    console.log('Saving token:',accessToken, expiresAt, refreshToken )
+
     connect(function (db, users) {
 
       users.update(
         {_id: email},
 
         {$set:{
-          freeagentToken: token
+          freeagentToken: {
+            accessToken: accessToken,
+            expiresAt: expiresAt,
+            refreshToken: refreshToken
+          }
         }},
 
         // options

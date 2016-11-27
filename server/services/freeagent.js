@@ -6,6 +6,8 @@ module.exports = function (context, scope) {
   var request = require('request');
   var Q = require('q');
 
+  var storage = require('./storage')(context);
+
   var apiGet = function (authToken, options, callback) {
     var deferred = null;
     var url;
@@ -153,9 +155,36 @@ module.exports = function (context, scope) {
     return (body + "").replace(regex, replace);
   };
 
+  function refreshToken (user, token, callback) {
+    var url = config.freeagent.apiUrl + '/token_endpoint';
+
+    var form = { grant_type: 'refresh_token', refresh_token: token.refreshToken};
+    var options = {
+      url: url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8',
+        'Authorization': 'Basic ' + new Buffer(config.freeagent.fattClientId+':'+config.freeagent.fattClientSecret).toString('base64'),
+        'User-Agent': 'node.js'
+      },
+      form: form
+    };
+
+    console.log('options', options)
+    request.post(options, function (error, response, body) {
+      console.log("Response to refreshToken: ", error, body);
+      var newToken = JSON.parse(body);
+      var expiresAt = Math.round((new Date()).getTime() / 1000) + newToken.expires_in - 3600;
+      storage.setUserToken(user, newToken.access_token, expiresAt, token.refreshToken, function(){
+        callback(newToken.access_token);
+      });
+    });
+  }
+
   return {
     apiGet: apiGet,
     apiPost: apiPost,
     apiDelete: apiDelete,
+    refreshToken: refreshToken
   };
 };

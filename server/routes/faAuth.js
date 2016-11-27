@@ -31,16 +31,20 @@ module.exports = function (path, context) {
 
     function saveToken(error, result) {
       var accessTokenKey = 'access_token';
-      //var refreshTokenKey = 'refresh_token';
+      var refreshTokenKey = 'refresh_token';
 
       if (error) { console.log('Access Token Error', error); res.send("Failed"); return; }
       console.log(result);
       var token = oauth2.accessToken.create(result);
       console.log(token);
 
+      var access_token = token.token[accessTokenKey];
+      var expires_in = token.token[accessTokenKey];
+      var expiresAt = Math.round((new Date()).getTime() / 1000) + expires_in - 3600;
+      var refresh_token = token.token[refreshTokenKey];
 
       if(req.user) {
-        storage.setUserToken(req.user, token.token[accessTokenKey], function(){
+        storage.setUserToken(req.user, access_token, expiresAt, refresh_token, function(){
           res.redirect(context.root);
         });
       } else {
@@ -71,7 +75,7 @@ module.exports = function (path, context) {
       return;
     }
 
-    storage.getUserToken(req.user, function(token){
+    storage.getUserToken(req.user, function(token) {
       res.send('Here would be the token: ' + token);
     });
   });
