@@ -10,7 +10,7 @@ module.exports = function (path, context) {
 
   var state = Math.random()+"fth";
 
-  var callbackUrl = config.siteName + path + "/callback";
+  var callbackUrl = config.siteName + context.root + path.replace('/', '') + "/callback";
 
   var oauth2 = require('simple-oauth2')({
     clientID: config.google.clientId,
@@ -65,7 +65,7 @@ module.exports = function (path, context) {
         var token = authauth.generateToken(payload.email);
         console.log('token', token);
         res.cookie('authauth', token, { maxAge: 604800000, httpOnly: true });
-        res.redirect('/sign');
+        res.redirect(context.root + 'sign');
       });
       //res.redirect('/');
     }

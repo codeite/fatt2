@@ -10,7 +10,7 @@ module.exports = function (path, context) {
     var user = req.user || "";
 
     if(user !== "") {
-      res.redirect('/');
+      res.redirect(context.root);
     } else {
       res.redirect(req.originalUrl + '/in');
     }

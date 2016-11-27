@@ -1,14 +1,14 @@
 extends layout
 
-block content  
+block content
   link(href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", rel="stylesheet")
-  link(href="/stylesheets/signin.css", rel="stylesheet")
+  link(href="/fatt/stylesheets/signin.css", rel="stylesheet")
   .container
       .omb_login
         h3.omb_authTitle
           | Login or
-          a(href='#' disabled) 
-            | Sign up
+          a(href='#' disabled)
+            |&nbsp;Sign up
         .row.omb_row-sm-offset-3.omb_socialButtons
           .col-xs-4.col-sm-2
             a.btn.btn-lg.btn-block.omb_btn-facebook(href='#' disabled)
@@ -19,7 +19,7 @@ block content
               i.fa.fa-twitter.visible-xs
               span.hidden-xs Twitter
           .col-xs-4.col-sm-2
-            a.btn.btn-lg.btn-block.omb_btn-google(href='/googleauth')
+            a.btn.btn-lg.btn-block.omb_btn-google(href='/fatt/googleauth')
               i.fa.fa-google-plus.visible-xs
               span.hidden-xs Google+
         .row.omb_row-sm-offset-3.omb_loginOr
@@ -38,9 +38,6 @@ block content
                 span.input-group-addon
                   i.fa.fa-lock
                 input.form-control(type='password', name='password', placeholder='Password' disabled)
-              span.help-block 
-                | 
-                // Password error
               button.btn.btn-lg.btn-primary.btn-block(type='submit' disabled) Login
         .row.omb_row-sm-offset-3
           .col-xs-12.col-sm-3
