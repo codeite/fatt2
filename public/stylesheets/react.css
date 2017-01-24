@@ -1,0 +1,75 @@
+* {
+  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+.timeslip {
+  display: flex;
+}
+
+.timeslip .timeslip-delete {
+  margin-top: 2px;
+  margin-right: 2px;
+  cursor: pointer;
+}
+
+.timeslip .timeslip-hours {
+  margin-left: auto;
+}
+
+.month {
+  border: 1px solid lightgrey;
+}
+
+.week {
+  display: flex;
+}
+
+.day {
+  width: calc(100% / 6);
+  border: 1px solid lightgrey;
+  margin: -1 -1 0 0;
+  padding: 3.5px
+}
+
+.day:hover {
+  border: 1px solid grey;
+  z-index: 2;
+}
+
+.day.selected {
+  border: 3px solid grey;
+  z-index: 1;
+  padding: 1.5px
+}
+
+.day.complete {
+  background-color: #dff0d8
+}
+
+.day.short {
+  background-color: #f2dede;
+}
+
+.day.today.weekend,
+.day.today {
+  background-color: #f5f5f5;
+  color: navy;
+}
+
+.day-total {
+  display: flex;
+}
+
+.day-total .day-total-hours {
+  margin-left: auto;
+  font-weight: bold;
+}
+
+.day.weekend {
+  width: calc(100% / 12);
+  background-color: #fcf8e3;
+}
+
+.day-of-week-label {
+  font-weight: bold;
+}
