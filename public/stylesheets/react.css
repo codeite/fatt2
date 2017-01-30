@@ -2,6 +2,48 @@
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
+.headerBar {
+  display: flex;
+  background-color: #ececff;
+  border-top: 1px solid #bcbcff;
+  border-bottom: 1px solid #bcbcff;
+}
+
+.addTaskBar {
+  display: flex;
+}
+
+.addTaskBar .dates {
+  display: flex;
+  align-items: flex-start;
+}
+
+.addTaskBar .buttons {
+  display: flex;
+  justify-content: space-between
+}
+
+.datePil {
+  display: inline-block;
+  background-color: #5656ff;
+  border: 1px soild white;
+  color: white;
+  padding: 2px 5px;
+  margin: 3px;
+  border-radius: 8px;  
+}
+
+.headerBar h1 {
+  padding: 1px 1em;
+}
+
+.headerBar .taskManager table{
+  background-color: white;
+  position: absolute;
+  padding: 0.5em;
+  z-index: 10;
+}
+
 .timeslip {
   display: flex;
 }
@@ -14,6 +56,11 @@
 
 .timeslip .timeslip-hours {
   margin-left: auto;
+}
+
+.day .day-timeslips {
+  height: 3em;
+  overflow-y: auto;
 }
 
 .month {
@@ -29,6 +76,10 @@
   border: 1px solid lightgrey;
   margin: -1 -1 0 0;
   padding: 3.5px
+}
+
+label.day {
+  font-weight: initial;
 }
 
 .day:hover {
@@ -70,6 +121,17 @@
   background-color: #fcf8e3;
 }
 
+.day .day-header {
+  display: flex;
+  justify-content: space-between;
+}
+
+
+
 .day-of-week-label {
   font-weight: bold;
+}
+
+.taskManager table td {
+  border: 1px solid grey;
 }

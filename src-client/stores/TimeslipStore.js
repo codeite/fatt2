@@ -1,12 +1,24 @@
 import faApi from '../services/fa-api'
 
 class TimeslipStore {
-  constructor(from, to) {
+  constructor() {
     this._days = {}
 
   }
 
+  createTimeslips(taskUrl, hours, dates, comment) {
+     return faApi.createTimeslips(taskUrl, hours, dates, comment)
+       .then(() => {
+        const sorted = dates.map(x => x.format('YYYY-MM-DD')).sort()
+
+        const from = sorted[0]
+        const to = sorted[sorted.length-1]
+        return this.loadRange(from, to)
+      })
+  }
+
   loadRange(from, to) {
+    console.log('load range', from, to)
     faApi.readTimeslips(from, to).then(ts => {
       this.storeTimeslips(ts.timeslips)
     })

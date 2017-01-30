@@ -112,6 +112,7 @@ module.exports = function (context, scope) {
       body: fixedBody
     };
 
+    console.log("fixedBody: ", fixedBody);
     request.post(url, options, function (error, response, body) {
       console.log("Response to POST: ", body);
       callback(error, response, body);

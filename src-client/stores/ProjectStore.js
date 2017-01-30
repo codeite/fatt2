@@ -1,4 +1,5 @@
 import faApi from '../services/fa-api'
+import ObservableValue from './ObservableValue'
 
 class ProjectStore {
   constructor() {
@@ -8,16 +9,15 @@ class ProjectStore {
 
   loadActiveProjects () {
     faApi.getActiveProjects().then(projects => {
-      console.log('projects:', projects)
       this.storeActiveProjects(projects)
     })
   }
 
   loadProject(projectUrl) {
-    if (this._projects[projectUrl]) this.storeProject(this._projects[projectUrl])
+    const projectVector = this.getOrCreateVector(projectUrl)
+    if (projectVector.project) return this.storeProject(projectVector.project)
 
     faApi.resolveProject(projectUrl).then(project => {
-      console.log('resolveProject -> response:', project)
       this.storeProject(project)
     })
   }
@@ -28,12 +28,17 @@ class ProjectStore {
     return projectVector.project
   }
 
-  getOrCreateProjectVector(projectUrl) {
-    let projectVector = this._projects[projectUrl]
+  getProjectOb (projectUrl) {
+    return this.getOrCreateVector(projectUrl).observer;
+  }
+
+  getOrCreateVector(url) {
+    let projectVector = this._projects[url]
     if (!projectVector) {
-      projectVector = this._projects[projectUrl] = {
-        projectUrl: projectUrl,
+      projectVector = this._projects[url] = {
+        projectUrl: url,
         callbacks: [],
+        observer: new ObservableValue(),
         project: null
       }
     }
@@ -46,7 +51,7 @@ class ProjectStore {
       return
     }
 
-    const projectVector = this.getOrCreateProjectVector(projectUrl)
+    const projectVector = this.getOrCreateVector(projectUrl)
     projectVector.callbacks.push(callback)
   }
 
@@ -68,7 +73,9 @@ class ProjectStore {
   }
 
   storeProject(project) {
-    const projectVector = this.getOrCreateProjectVector(project.url)
+    const projectVector = this.getOrCreateVector(project.url)
+    console.log('loaded project', project.name)
+    projectVector.observer.setValue(project)
     projectVector.project = project
     projectVector.callbacks.forEach(cb => cb(projectVector.project))
   }

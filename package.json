@@ -8,7 +8,8 @@
   "main": "server/app.js",
   "scripts": {
     "start": "node server/app.js",
-    "dev": "nodemon server/app.js"
+    "dev": "nodemon server/app.js",
+    "mongo": "cd dc && docker-compose up && cd .."
   },
   "dependencies": {
     "angular": "^1.3.1",
