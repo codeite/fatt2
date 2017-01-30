@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node server/app.js",
     "dev": "nodemon server/app.js",
-    "mongo": "cd dc && docker-compose up && cd .."
+    "mongo": "cd dc && docker-compose up && cd ..",
+    "test": "mocha ./src-client/tests/.setup.js ./src-client/tests/**/*spec.jsx"
   },
   "dependencies": {
     "angular": "^1.3.1",
@@ -38,12 +39,17 @@
     "babel-preset-es2015": "^6.22.0",
     "babel-preset-react": "^6.22.0",
     "debug": "~2.0.0",
+    "enzyme": "^2.7.1",
     "gulp": "^3.8.10",
     "gulp-jshint": "^1.9.0",
     "jade": "~1.6.0",
+    "jsdom": "^9.9.1",
+    "mocha": "^3.2.0",
+    "must": "^0.13.4",
     "nodemon": "^1.3.7",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "sinon": "^1.17.7",
     "webpack": "^1.14.0",
     "webpack-split-by-path": "0.0.10"
   }

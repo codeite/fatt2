@@ -2,37 +2,11 @@ import React from 'react'
 import stores from '../stores'
 const moment = require('moment')
 
+import ObserveString from './ObserveString'
+import Timeslip from './Timeslip'
+
 const isoDateOnly = "YYYY-MM-DD"
 const isoMonthOnly = "YYYY-MM"
-
-const ObserveString = React.createClass({
-  getDefaultProps() { return {t: x => '' + x} },
-  getInitialState() { return {value: ''} },
-  listener(newValue) { this.setState({value: newValue}) },
-  componentWillMount() {
-    this.props.ob.addListener(this.listener)
-    this.setState({value:this.props.ob.getValue()})
-  },
-  componentWillUnmount() { this.props.ob.removeListener(this.listener) },
-
-  render() {
-    return <span>{this.props.t(this.state.value)}</span>
-  }
-})
-
-const Timeslip = React.createClass({
-
-  render () {
-    const timeslip = this.props.timeslip
-    const observableDisplayName = <ObserveString ob={stores.taskDisplayNameStore.getTaskDisplayNameOb(timeslip.task) } />
-
-    return <div className='timeslip' >
-      <div className='timeslip-delete glyphicon glyphicon-remove-sign' onClick={this.props.delete}></div>
-      <div className='timeslip-task' >Task: {observableDisplayName}</div>
-      <div className='timeslip-hours' >{parseInt(timeslip.hours || 0, 10) }h</div>
-    </div>
-  }
-})
 
 const Day = React.createClass({
   getInitialState() {
@@ -86,7 +60,10 @@ const Day = React.createClass({
     if (this.state.loaded) {
       timeslips = this.state.timeslips
       total = this.state.total
-      timeslipsHtml = timeslips.map(timeslip => <Timeslip key={timeslip.url} timeslip={timeslip} delete={e => this.deleteTimeslip(e, timeslip)}/>)
+      timeslipsHtml = timeslips.map(timeslip => {
+        const taskNameOb = stores.taskDisplayNameStore.getTaskDisplayNameOb(timeslip.task)
+        return <Timeslip key={timeslip.url} hours={timeslip.hours} taskNameOb={taskNameOb} onDelete={e => this.deleteTimeslip(e, timeslip)}/>
+      })
     }
 
     if (date.isSame(moment(), 'day')) {
