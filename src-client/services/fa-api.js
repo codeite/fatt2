@@ -14,9 +14,16 @@ const faApi = {
   resolveContact: contactUrl => getAndCache(contactUrl, "contact"),
   readTimeslips: (fromDate, toDate) => readList(`/fatt/freeagent/timeslips?from_date=${fromDate}&to_date=${toDate}`, 'timeslips'),
 
-  createTimeslips
+  createTimeslips,
+  deleteTimeslip
 }
 
+function deleteTimeslip(timeslipUrl) {
+  return fetch(timeslipUrl, {
+    credentials: 'same-origin',
+    method: 'DELETE'
+  })
+}
 
 function createTimeslips(taskUrl, hours, dates, comment) {
   console.log('taskUrl:', taskUrl)

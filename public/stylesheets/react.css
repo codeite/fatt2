@@ -14,13 +14,12 @@
 }
 
 .addTaskBar .dates {
-  display: flex;
-  align-items: flex-start;
+  display: block;
 }
 
 .addTaskBar .buttons {
   display: flex;
-  justify-content: space-between
+  justify-content: space-between;
 }
 
 .datePil {

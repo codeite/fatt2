@@ -35,11 +35,12 @@ class TimeslipStore {
   dayToDay(day) {
     return {
       timeslips: [...day.timeslips.values()],
-      total: day.total
+      total: day.total || 0
     }
   }
 
   getOrCreateDay(date) {
+    if(date.format) date = date.format('YYYY-MM-DD')
     let day = this._days[date]
     if (!day) day = this._days[date] = this.createDay(date)
     return day
@@ -63,6 +64,27 @@ class TimeslipStore {
       callbacks: [],
       timeslips: new Map()
     }
+  }
+
+  deleteTimeslips(dates) {
+    const timeslips = []
+    dates.forEach(date => {
+      const day = this.getOrCreateDay(date)
+      console.log(date, [...day.timeslips.values()])
+      Array.prototype.push.apply(timeslips, [...day.timeslips.values()])
+    })
+    return Promise.all(timeslips.map(this.deleteTimeslip.bind(this)))
+  }
+
+  deleteTimeslip(timeslip) {
+    return faApi.deleteTimeslip(timeslip.url)
+      .then(() => {
+        const day = this.getOrCreateDay(timeslip.dated_on)
+        if (day.timeslips.delete(timeslip.url)) {
+          day.total = [...day.timeslips.values()].reduce((p, c) => p + parseInt(c.hours, 10), 0)
+          day.callbacks.forEach(cb => cb(this.dayToDay(day)))
+        }
+      })
   }
 
   storeTimeslip(timeslip) {

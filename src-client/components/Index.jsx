@@ -4,98 +4,12 @@ const moment = require('moment')
 
 import ObserveString from './ObserveString'
 import Timeslip from './Timeslip'
+import {Day, DayContainer} from './Day'
 
 const isoDateOnly = "YYYY-MM-DD"
 const isoMonthOnly = "YYYY-MM"
 
-const Day = React.createClass({
-  getInitialState() {
-    const day = stores.timeslipStore.getDay(this.props.date)
 
-    return Object.assign({
-      loaded: !!day
-    }, day)
-  },
-
-  componentWillMount() {
-    const selectedOb = stores.selectedStore.getDayOb(this.props.date)
-    selectedOb.addListener(selected => {
-      this.setState({selected: selected})
-    })
-    this.setState({selected: selectedOb.getValue()})
-
-    stores.timeslipStore.registerCallback(this.props.date, day => {
-
-      this.setState(Object.assign({
-        loaded: true
-      }, day))
-    })
-  },
-
-  select (e) {
-    //this.setState({selected: !this.state.selected})
-    if (e.shiftKey) {
-      stores.selectedStore.setToDay(this.props.date, !this.state.selected)
-    } else {
-      const selectedOb = stores.selectedStore.getDayOb(this.props.date)
-      selectedOb.setValue(!this.state.selected)
-      document.getSelection().removeAllRanges();
-    }
-  },
-
-  deleteTimeslip(e, timeslip) {
-    e.stopPropagation()
-  },
-
-  render () {
-    const date = moment(this.props.date)
-    const inMonth = date.isSame(this.props.month, 'month')
-    const isWeekday = date.isoWeekday() < 6
-
-    let timeslips = []
-    let total = 0
-    let timeslipsHtml = ''
-    let className = 'day'
-
-    if (this.state.loaded) {
-      timeslips = this.state.timeslips
-      total = this.state.total
-      timeslipsHtml = timeslips.map(timeslip => {
-        const taskNameOb = stores.taskDisplayNameStore.getTaskDisplayNameOb(timeslip.task)
-        return <Timeslip key={timeslip.url} hours={timeslip.hours} taskNameOb={taskNameOb} onDelete={e => this.deleteTimeslip(e, timeslip)}/>
-      })
-    }
-
-    if (date.isSame(moment(), 'day')) {
-        className += ' today'
-      } else if (date.isBefore(moment())) {
-        if (total < 8) {
-          className += ' short'
-        } else {
-          className += ' complete'
-        }
-      }
-
-
-    if(!inMonth) className += ' text-muted'
-    if(isWeekday) {
-      className += ' '
-    } else {
-      className += ' weekend'
-    }
-
-    return <div className={className} onClick={this.select} >
-      <div className='day-header'>
-        <span>{date.format('Do')}</span>
-        <span>
-          <input type='checkbox' checked={this.state.selected} />
-        </span>
-      </div>
-      <div className='day-total'>Total: <span className='day-total-hours'>{parseInt(total || 0, 10)}h</span></div>
-      <div className='day-timeslips'>{timeslipsHtml}</div>
-    </div>
-  }
-})
 
 const DayOfWeekLabel = React.createClass({
   render () {
@@ -113,7 +27,7 @@ const Week = React.createClass({
     const start = moment(this.props.start);
     const days = Array.from(Array(7).keys()).map(offset => start.clone().add(offset, 'days').format(isoDateOnly));
 
-    return <div className="week">{days.map(d => <Day month={this.props.month} date={d} key={d} />)}</div>
+    return <div className="week">{days.map(d => <DayContainer month={this.props.month} date={d} key={d} />)}</div>
   }
 })
 const WeekDays = React.createClass({
@@ -126,7 +40,14 @@ const WeekDays = React.createClass({
 })
 
 const Month = React.createClass({
-
+  componentWillMount() {
+    this.componentWillReceiveProps(this.props)
+  },
+  componentWillReceiveProps (newProps) {
+    const from = newProps.firstDay.format(isoDateOnly)
+    const to = newProps.lastDay.format(isoDateOnly)
+    stores.timeslipStore.loadRange(from, to)
+  },
   render () {
     const month = moment(this.props.month)
     const weekStarting = moment(this.props.firstDay)
@@ -289,6 +210,10 @@ const AddTaskBar = React.createClass({
         this.setState({comment: ''})
       })
   },
+  delete() {
+    stores.timeslipStore.deleteTimeslips(this.state.selectedDates)
+      .then(() => stores.selectedStore.clear())
+  },
   clear() {
     stores.selectedStore.clear()
   },
@@ -309,6 +234,7 @@ const AddTaskBar = React.createClass({
         </div>
         <div className='buttons'>
           <input type='button' value='Add' onClick={this.addTimeSlips} />
+          <input type='button' value='Delete' onClick={this.delete} />
           <input type='button' value='Clear' onClick={this.clear} />
         </div>
       </div>
@@ -321,7 +247,10 @@ const AddTaskBar = React.createClass({
 
 const Fatt = React.createClass({
   getInitialState() {
-    const month = moment(moment().format(isoMonthOnly))
+    return this.calcState(moment())
+  },
+  calcState(month) {
+    month = moment(moment(month).format(isoMonthOnly))
     const firstDay = month.clone()
     while(firstDay.isoWeekday() != 1) {
       firstDay.add(-1, 'days')
@@ -339,17 +268,23 @@ const Fatt = React.createClass({
       lastDay
     }
   },
+  move(months) {
+    this.setState(this.calcState(this.state.month.clone().add(months, 'month')))
+  },
   componentWillMount() {
-    const from = this.state.firstDay.format(isoDateOnly)
-    const to = this.state.lastDay.format(isoDateOnly)
-    stores.timeslipStore.loadRange(from, to)
     stores.taskStore.loadActiveTasks()
     stores.projectStore.loadActiveProjects()
   },
   render () {
     return <div>
-      <div className='headerBar'><h1>{this.state.monthName}</h1><TaskManager /><AddTaskBar /></div>
-      <Month month={this.state.month} firstDay={this.state.firstDay} />
+      <div className='headerBar'>
+        <a onClick={() => this.move(-1)}>Prev</a>
+        <h1>{this.state.monthName}</h1>
+        <a onClick={() => this.move(1)}>Next</a>
+        <TaskManager />
+        <AddTaskBar />
+      </div>
+      <Month month={this.state.month} firstDay={this.state.firstDay} lastDay={this.state.lastDay}/>
     </div>
   }
 })
