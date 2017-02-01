@@ -86,6 +86,26 @@ module.exports = function (path, context) {
     });
   });
 
+  router.put('/*', function (req, res) {
+    var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
+    console.log("PUT: " + url);
+
+    getToken(req, function(authToken) {
+      console.log("Auth: " + authToken);
+
+      console.log(req.body);
+
+      freeagent.apiPut(authToken, url, JSON.stringify(req.body),
+        function (error, response, body) {
+          //if (!error && response.statusCode == 200) {
+          //console.log('body', body)
+          //}
+          res.send("");
+        }
+      );
+    });
+  });
+
   router.delete('/*', function (req, res) {
     var url = buildUrl(config.freeagent.apiUrl, req.path, req.query);
     console.log("DELETE: " + url);

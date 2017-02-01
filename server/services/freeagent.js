@@ -112,9 +112,26 @@ module.exports = function (context, scope) {
       body: fixedBody
     };
 
-    console.log("fixedBody: ", fixedBody);
     request.post(url, options, function (error, response, body) {
       console.log("Response to POST: ", body);
+      callback(error, response, body);
+    });
+  };
+
+  var apiPut = function (authToken, url, body, callback) {
+    var fixedBody = replaceLocalWithRemote(body);
+    var options = {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'User-Agent': 'node.js',
+        'Authorization': 'Bearer ' + authToken
+      },
+      body: fixedBody
+    };
+
+    request.put(url, options, function (error, response, body) {
+      console.log("Response to PUT: ", body);
       callback(error, response, body);
     });
   };
@@ -185,6 +202,7 @@ module.exports = function (context, scope) {
   return {
     apiGet: apiGet,
     apiPost: apiPost,
+    apiPut: apiPut,
     apiDelete: apiDelete,
     refreshToken: refreshToken
   };

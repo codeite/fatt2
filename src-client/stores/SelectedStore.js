@@ -36,7 +36,7 @@ export default class SelectedStore {
       return this._days.get(dse)
     } else {
       //console.log('getDayByDse', dse, 'new')
-      const ob = new ObservableValue(false)
+      const ob = new ObservableValue('selected_'+dse, false)
       ob.addListener(checked => {
         //console.log('Change', dse, 'to', checked)
         //console.log('Set _lastSetDse:', dse)
@@ -58,7 +58,7 @@ export default class SelectedStore {
   // }
 
   setToDay(date, checked) {
-    console.log('setToDate:', date, checked)
+    //console.log('setToDate:', date, checked)
     if (this._lastSetDse === undefined) return this.getDayOb(date).setValue(checked)
 
     date = moment(date)
@@ -66,7 +66,7 @@ export default class SelectedStore {
     const lastDse = this._lastSetDse
 
     const inc = dse > this._lastSetDse ? -1 : 1
-    console.log('from', dse, 'to', lastDse, 'step', inc)
+    //console.log('from', dse, 'to', lastDse, 'step', inc)
     for(let i=dse, x=0; i !== lastDse && x < 200; i += inc, x++) {
       const day = this.getDayByDse(i)
       if (day.date.isoWeekday() < 6) {

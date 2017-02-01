@@ -104,6 +104,9 @@ const TaskManagerTask = React.createClass({
   cancel() {
     this.setState({newName: '', editing: false})
   },
+  onDelete (task) {
+    stores.taskStore.completeTask(this.props.task.url)
+  },
   render() {
     const observableProject = <ObserveString ob={stores.projectStore.getProjectOb(this.props.task.project)} t={x=>x && x.name}/>
     const observableDisplayName = <ObserveString ob={stores.taskDisplayNameStore.getTaskDisplayNameOb(this.props.task.url) } />
@@ -111,12 +114,14 @@ const TaskManagerTask = React.createClass({
 
     return <tbody>
       <tr>
+        <td><div className='timeslip-delete glyphicon glyphicon-remove-sign' onClick={this.onDelete} /></td>
         <td>{observableProject}</td>
         <td>{this.props.task.name}</td>
         {!this.state.editing ?
         <td onClick={this.startEditing}>{observableDisplayName}</td>
         :
         <td>
+
           <input value={this.state.newName} placeholder={this.props.task.name} onChange={e => this.setState({newName: e.target.value})} />
           <input type='button' value='Save' onClick={this.save} />
           <input type='button' value='Cancel' onClick={this.cancel} />
@@ -140,12 +145,19 @@ const TaskManager = React.createClass({
     })
     this.setState({activeTasks: stores.taskStore.getActiveTasks()})
   },
+  refresh() {
+    stores.taskStore.loadActiveTasks(true)
+    stores.projectStore.loadActiveProjects(true)
+  },
   render() {
 
     return <div className='taskManager'>
       <h2 onClick={() => this.setState({visible: !this.state.visible})}>Task Manager</h2>
       <table className={this.state.visible ? 'show' : 'hide'}>
-        <thead><tr><th>Project Name</th><th>Task Name</th><th>Display As</th><th></th></tr></thead>
+        <thead>
+          <tr><th/><th>Project Name</th><th>Task Name</th><th>Display As</th><th></th></tr>
+          <tr><th colSpan="4"><a onClick={this.refresh}>Refresh</a></th></tr>
+        </thead>
         {this.state.activeTasks.map(task => <TaskManagerTask key={task.url} task={task} />)}
       </table>
     </div>

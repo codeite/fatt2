@@ -1,7 +1,7 @@
 
 class ObservableValue {
-  constructor(initalValue) {
-
+  constructor(name, initalValue) {
+    this.name = name
     this.listeners = new Set()
     this.value = initalValue
   }

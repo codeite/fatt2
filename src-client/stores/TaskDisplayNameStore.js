@@ -4,35 +4,35 @@ import ls from '../services/ls'
 class TaskDisplayNameStore {
   constructor (taskStore) {
     this.taskStore = taskStore
-    this.observables = []
+    this._observables = []
   }
 
   getTaskDisplayName (taskUrl) {
-    let observable = this.observables[taskUrl]
+    let observable = this._observables[taskUrl]
+
     if (observable) return observable.getValue()
     return ''
   }
 
   getTaskDisplayNameOb (taskUrl) {
-    let observable = this.observables[taskUrl]
+    let observable = this._observables[taskUrl]
     if (observable) return observable
 
     const displayNames = ls.getItem('displayNames') || {}
 
     const taskOb = this.taskStore.getTaskOb(taskUrl)
-    taskOb.addListener(newTask => this.setTaskName(newTask))
+    taskOb.addListener(newTask => this.setTask(newTask))
     const task = taskOb.getValue()
     const taskName = task && task.name
 
-    observable = this.observables[taskUrl] = new ObservableValue(displayNames[taskUrl] || taskName)
+    observable = this._observables[taskUrl] = new ObservableValue('tdns'+taskUrl, displayNames[taskUrl] || taskName)
     observable.taskOb = taskOb
     return observable
   }
 
-  setTaskName(task) {
+  setTask(task) {
     const displayNames = ls.getItem('displayNames') || {}
-
-    if(!newDisplayName || newDisplayName.length === 0) {
+    if(!displayNames[task.url]) {
       const observable = this.getTaskDisplayNameOb(task.url)
       observable.setValue(task.name)
     }

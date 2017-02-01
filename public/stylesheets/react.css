@@ -134,3 +134,7 @@ label.day {
 .taskManager table td {
   border: 1px solid grey;
 }
+
+a:not([href]) {
+  cursor: pointer;
+}

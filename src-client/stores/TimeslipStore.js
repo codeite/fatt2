@@ -18,7 +18,7 @@ class TimeslipStore {
   }
 
   loadRange(from, to) {
-    console.log('load range', from, to)
+    //console.log('load range', from, to)
     faApi.readTimeslips(from, to).then(ts => {
       this.storeTimeslips(ts.timeslips)
     })
@@ -70,7 +70,7 @@ class TimeslipStore {
     const timeslips = []
     dates.forEach(date => {
       const day = this.getOrCreateDay(date)
-      console.log(date, [...day.timeslips.values()])
+      //console.log(date, [...day.timeslips.values()])
       Array.prototype.push.apply(timeslips, [...day.timeslips.values()])
     })
     return Promise.all(timeslips.map(this.deleteTimeslip.bind(this)))

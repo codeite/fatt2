@@ -7,15 +7,33 @@ const callbacks = {}
 const faApi = {
   getMe: () => getAndCache('/fatt/freeagent/users/me', "user"),
   getCompany: () => getAndCache('/fatt/freeagent/company', "company"),
-  getActiveProjects: () => getAndCache('/fatt/freeagent/projects?view=active', 'projects'),
-  getActiveTasks: () => getAndCache('/fatt/freeagent/tasks?view=active', 'tasks'),
+  getActiveProjects: (reload) => getAndCache('/fatt/freeagent/projects?view=active', 'projects', reload),
+  getActiveTasks: (reload) => getAndCache('/fatt/freeagent/tasks?view=active', 'tasks', reload),
   resolveProject: projectUrl => getAndCache(projectUrl, "project"),
   resolveTask: taskUrl => getAndCache(taskUrl, "task"),
   resolveContact: contactUrl => getAndCache(contactUrl, "contact"),
   readTimeslips: (fromDate, toDate) => readList(`/fatt/freeagent/timeslips?from_date=${fromDate}&to_date=${toDate}`, 'timeslips'),
 
   createTimeslips,
-  deleteTimeslip
+  deleteTimeslip,
+  completeTask
+}
+
+function completeTask(taskUrl) {
+  const body = JSON.stringify({
+    task: {
+      status: 'Completed'
+    }
+  })
+
+  return fetch(taskUrl, {
+    credentials: 'same-origin',
+    method: 'PUT',
+    body: body,
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  })
 }
 
 function deleteTimeslip(timeslipUrl) {
@@ -26,10 +44,8 @@ function deleteTimeslip(timeslipUrl) {
 }
 
 function createTimeslips(taskUrl, hours, dates, comment) {
-  console.log('taskUrl:', taskUrl)
   return Promise.all([faApi.getMe(), faApi.resolveTask(taskUrl)])
     .then(([me, task]) => {
-      console.log('task:', task)
       const data = {
         timeslips: dates.map(date => {
           return {
@@ -132,12 +148,11 @@ function readLinks(link) {
   return res;
 }
 
-function getAndCache(url, transform) {
+function getAndCache(url, transform, reload) {
   return new Promise((resolve, reject) => {
     var value = ls.getItem(url);
-    //console.log('cached: ', url, value)
 
-    if (value) {
+    if (value && !reload) {
       //console.log('object: ', url, value)
       let resolvedValue
       if (typeof(transform) === 'function') resolvedValue = transform(value)
@@ -170,6 +185,7 @@ function getAndCache(url, transform) {
           else resolvedData = data
           resolver.resolve(resolvedData)
         })
+        delete callbacks[url]
       })
       .catch(err => {
         console.error('Fail: ', url);

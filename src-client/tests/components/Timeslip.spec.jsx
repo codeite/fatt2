@@ -9,7 +9,7 @@ import ObservableValue from '../../stores/ObservableValue'
 describe('<Timeslip />', () => {
   let taskNameOb
   beforeEach(() => {
-    taskNameOb = new ObservableValue('myTaskName')
+    taskNameOb = new ObservableValue('', 'myTaskName')
   })
 
   it('has text "8.0" hours', () => {

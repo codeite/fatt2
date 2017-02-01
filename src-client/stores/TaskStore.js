@@ -8,8 +8,8 @@ class TaskStore {
     this._activeTasksCallbacks = []
   }
 
-  loadActiveTasks () {
-    faApi.getActiveTasks().then(tasks => {
+  loadActiveTasks (reload) {
+    faApi.getActiveTasks(reload).then(tasks => {
       this.storeActiveTasks(tasks)
     })
   }
@@ -23,6 +23,7 @@ class TaskStore {
     if (taskVector.task) return this.storeTask(taskVector.task)
 
     faApi.resolveTask(taskUrl).then(task => {
+      // console.log('Got task:', task)
       this.storeTask(task)
     })
   }
@@ -43,11 +44,17 @@ class TaskStore {
       taskVector = this._tasks[taskUrl] = {
         taskUrl: taskUrl,
         callbacks: [],
-        observer: new ObservableValue(),
+        observer: new ObservableValue(taskUrl),
         task: null
       }
+      this.loadTask(taskUrl)
     }
     return taskVector
+  }
+
+  completeTask(taskUrl) {
+    faApi.completeTask(taskUrl)
+      .then(() => this.loadActiveTasks(true))
   }
 
   registerCallback(taskUrl, callback) {

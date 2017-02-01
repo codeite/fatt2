@@ -38,9 +38,10 @@ class ProjectStore {
       projectVector = this._projects[url] = {
         projectUrl: url,
         callbacks: [],
-        observer: new ObservableValue(),
+        observer: new ObservableValue(url),
         project: null
       }
+      this.loadProject(url)
     }
     return projectVector
   }
@@ -74,7 +75,6 @@ class ProjectStore {
 
   storeProject(project) {
     const projectVector = this.getOrCreateVector(project.url)
-    console.log('loaded project', project.name)
     projectVector.observer.setValue(project)
     projectVector.project = project
     projectVector.callbacks.forEach(cb => cb(projectVector.project))

@@ -3,10 +3,12 @@ import React from 'react'
 const ObserveString = React.createClass({
   getDefaultProps() { return {t: x => '' + x} },
   getInitialState() { return {value: ''} },
-  listener(newValue) { this.setState({value: newValue}) },
+  listener(newValue) {
+    this.setState({value: newValue})
+  },
   componentWillMount() {
-    this.props.ob.addListener(this.listener)
-    this.setState({value:this.props.ob.getValue()})
+    this.props.ob.addListener(v => this.listener(v))
+    this.setState({value:this.props.ob.getValue() || 'loading'})
   },
   componentWillUnmount() { this.props.ob.removeListener(this.listener) },
 
