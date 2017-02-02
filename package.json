@@ -11,7 +11,9 @@
     "dev": "nodemon server/app.js",
     "mongo": "cd dc && docker-compose up && cd ..",
     "test": "mocha ./src-client/tests/.setup.js ./src-client/tests/**/*spec.jsx",
-    "watch": "webpack --watch"
+    "build": "webpack",
+    "watch": "webpack --watch",
+    "build-docker": "docker images thecodeite/fatt && echo 'What version?' && read v && docker build -t \"thecodeite/fatt:$v\" ."
   },
   "dependencies": {
     "angular": "^1.3.1",
@@ -19,6 +21,7 @@
     "cookie-parser": "~1.3.3",
     "cookies": "^0.5.0",
     "express": "~4.9.0",
+    "jade": "~1.6.0",
     "lodash": "^3.7.0",
     "moment": "^2.10.2",
     "mongodb": "^2.2.11",
@@ -43,7 +46,6 @@
     "enzyme": "^2.7.1",
     "gulp": "^3.8.10",
     "gulp-jshint": "^1.9.0",
-    "jade": "~1.6.0",
     "jsdom": "^9.9.1",
     "mocha": "^3.2.0",
     "must": "^0.13.4",
