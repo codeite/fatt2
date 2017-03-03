@@ -1,136 +1,16 @@
 import React from 'react'
 import stores from '../stores'
-const moment = require('moment')
+import moment from 'moment'
 
 import ObserveString from './ObserveString'
-import Timeslip from './Timeslip'
-import {Day, DayContainer} from './Day'
+import MonthContainer from './MonthContainer'
+import TaskManagerTaskContainer from './TaskManagerTaskContainer'
 
-const isoDateOnly = "YYYY-MM-DD"
-const isoMonthOnly = "YYYY-MM"
-
-
-
-const DayOfWeekLabel = React.createClass({
-  render () {
-    const date = moment(this.props.date)
-    let className = 'day day-of-week-label'
-    const isWeekday = date.isoWeekday() < 6
-    if(!isWeekday) className += ' weekend'
-
-    return <div className={className}>{date.format('ddd')}</div>
-  }
-})
-
-const Week = React.createClass({
-  render () {
-    const start = moment(this.props.start);
-    const days = Array.from(Array(7).keys()).map(offset => start.clone().add(offset, 'days').format(isoDateOnly));
-
-    return <div className="week">{days.map(d => <DayContainer month={this.props.month} date={d} key={d} />)}</div>
-  }
-})
-const WeekDays = React.createClass({
-  render () {
-    const start = moment(this.props.start);
-    const days = Array.from(Array(7).keys()).map(offset => start.clone().add(offset, 'days'));
-
-    return <div className="week">{days.map(d => <DayOfWeekLabel date={d} key={d.format('ddd')} />)}</div>
-  }
-})
-
-const Month = React.createClass({
-  componentWillMount() {
-    this.componentWillReceiveProps(this.props)
-  },
-  componentWillReceiveProps (newProps) {
-    const from = newProps.firstDay.format(isoDateOnly)
-    const to = newProps.lastDay.format(isoDateOnly)
-    stores.timeslipStore.loadRange(from, to)
-  },
-  render () {
-    const month = moment(this.props.month)
-    const weekStarting = moment(this.props.firstDay)
-
-    const weeks = [<WeekDays start={weekStarting.clone()} key='lables' />]
-    const lastDay = month.clone().add(1, 'month').add(-1, 'day')
-    while(weekStarting < lastDay && weeks.length < 10) {
-      let weekStartingDate = weekStarting.format(isoDateOnly)
-      weeks.push(<Week month={month} start={weekStartingDate} key={weekStartingDate} />)
-      weekStarting.add(1, 'week')
-    }
-
-    return <div className="month">{weeks}</div>
-  }
-})
-
-// const TaskManagerProject = React.createClass({
-//   getInitialState() {
-//     const project = stores.projectStore.getProject(this.props.projectUrl)
-//     return {
-//       project: project ? project : {name: 'unloaded'}
-//     }
-//   },
-
-//   componentWillMount() {
-//     stores.projectStore.registerCallback(this.props.projectUrl, project => {
-//       this.setState({project: project ? project : {}})
-//     })
-//     stores.projectStore.loadProject(this.props.projectUrl)
-//   },
-//   render() {
-//     return <span>{this.state.project.name}</span>
-//   }
-// })
-
-const TaskManagerTask = React.createClass({
-  getInitialState() {
-    return {
-      newName: '',
-      editing: false
-    }
-  },
-  startEditing() {
-    console.log('stores.taskDisplayNameStore.getTaskDisplayName(this.props.task.url)', stores.taskDisplayNameStore.getTaskDisplayName(this.props.task.url) )
-    this.setState({
-      editing: true,
-      newName: stores.taskDisplayNameStore.getTaskDisplayName(this.props.task.url)
-    })
-  },
-  save() {
-    stores.taskDisplayNameStore.setDisplayName(this.props.task.url, this.state.newName)
-    this.setState({newName: '', editing: false})
-  },
-  cancel() {
-    this.setState({newName: '', editing: false})
-  },
-  onDelete (task) {
-    stores.taskStore.completeTask(this.props.task.url)
-  },
-  render() {
-    const observableProject = <ObserveString ob={stores.projectStore.getProjectOb(this.props.task.project)} t={x=>x && x.name}/>
-    const observableDisplayName = <ObserveString ob={stores.taskDisplayNameStore.getTaskDisplayNameOb(this.props.task.url) } />
+const isoMonthOnly = 'YYYY-MM'
+const isoDateOnly = 'YYYY-MM-DD'
 
 
-    return <tbody>
-      <tr>
-        <td><div className='timeslip-delete glyphicon glyphicon-remove-sign' onClick={this.onDelete} /></td>
-        <td>{observableProject}</td>
-        <td>{this.props.task.name}</td>
-        {!this.state.editing ?
-        <td onClick={this.startEditing}>{observableDisplayName}</td>
-        :
-        <td>
 
-          <input value={this.state.newName} placeholder={this.props.task.name} onChange={e => this.setState({newName: e.target.value})} />
-          <input type='button' value='Save' onClick={this.save} />
-          <input type='button' value='Cancel' onClick={this.cancel} />
-        </td>
-        }
-      </tr>
-    </tbody>
-  }
-})
 
 const TaskManager = React.createClass({
   getInitialState() {
@@ -150,7 +30,6 @@ const TaskManager = React.createClass({
     stores.projectStore.loadActiveProjects(true)
   },
   render() {
-
     return <div className='taskManager'>
       <h2 onClick={() => this.setState({visible: !this.state.visible})}>Task Manager</h2>
       <table className={this.state.visible ? 'show' : 'hide'}>
@@ -158,7 +37,7 @@ const TaskManager = React.createClass({
           <tr><th/><th>Project Name</th><th>Task Name</th><th>Display As</th><th></th></tr>
           <tr><th colSpan="4"><a onClick={this.refresh}>Refresh</a></th></tr>
         </thead>
-        {this.state.activeTasks.map(task => <TaskManagerTask key={task.url} task={task} />)}
+        {this.state.activeTasks.map(task => <TaskManagerTaskContainer key={task.url} task={task} />)}
       </table>
     </div>
   }
@@ -281,7 +160,12 @@ const Fatt = React.createClass({
     }
   },
   move(months) {
-    this.setState(this.calcState(this.state.month.clone().add(months, 'month')))
+    const newState = this.calcState(this.state.month.clone().add(months, 'month'))
+    this.setState(newState)
+
+    const from = newState.firstDay.format(isoDateOnly)
+    const to = newState.lastDay.format(isoDateOnly)
+    stores.timeslipStore.loadRange(from, to)
   },
   componentWillMount() {
     stores.taskStore.loadActiveTasks()
@@ -296,7 +180,7 @@ const Fatt = React.createClass({
         <TaskManager />
         <AddTaskBar />
       </div>
-      <Month month={this.state.month} firstDay={this.state.firstDay} lastDay={this.state.lastDay}/>
+      <MonthContainer month={this.state.month} firstDay={this.state.firstDay} lastDay={this.state.lastDay} />
     </div>
   }
 })

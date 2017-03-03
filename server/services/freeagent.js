@@ -70,7 +70,7 @@ module.exports = function (context, scope) {
 
     var getCallback = function (error, response, body) {
       if(error) {
-        throw error;
+        deferred.reject(error);
       }
 
       if (response.statusCode === 200) {
