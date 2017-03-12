@@ -22,6 +22,6 @@ export default function Month (props) {
 
   return <div className='month'>
     <WeekDays start={weekStarting.clone()} key='lables' />
-    {weeks.map(week => <Week month={month} start={week.StartingDate} key={week.StartingDate} />)}
+    {weeks.map(week => <Week month={month} start={week} key={week} />)}
   </div>
 }

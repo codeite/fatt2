@@ -55,3 +55,6 @@ const TaskManagerTask = React.createClass({
     </tbody>
   }
 })
+
+module.exports = TaskManagerTask
+export default TaskManagerTask

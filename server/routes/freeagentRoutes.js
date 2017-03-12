@@ -14,6 +14,9 @@ module.exports = function (path, context) {
     storage.getUserToken(req.user, function(token) {
       var now = Math.round((new Date()).getTime() / 1000)
 
+      console.log('token:', token)
+      console.log('token.expiresAt:', token.expiresAt)
+
       if (token && token.expiresAt < now) {
         return freeagent.refreshToken(req.user, token, function(newAccessToken) {
           callback(newAccessToken);
