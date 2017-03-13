@@ -1,26 +1,33 @@
 const path = require('path')
-const SplitByPathPlugin = require('webpack-split-by-path');
+const SplitByPathPlugin = require('webpack-split-by-path')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+
+const env = process.env['ENV'] || 'local'
+const outputDir = 'dist-' + env
 
 module.exports = {
   entry: {
-    app: './entry'
+    app: [
+      `./src/config-${env}`,
+      './entry'
+    ]
   },
   output: {
-    path: path.resolve(__dirname, 'public/react'),
-    filename: "[name].js",
-    chunkFilename: "[name].js"
+    path: path.resolve(__dirname, outputDir),
+    filename: 'js/[name].js',
+    chunkFilename: 'js/[name].js'
   },
   resolve: {
-    extensions: ['', '.js', '.jsx'],
+    extensions: ['', '.js', '.jsx']
   },
   devtool: 'cheap-eval-source-map',
   debug: true,
-  module : {
-    loaders : [
+  module: {
+    loaders: [
       {
-        test : /\.jsx?/,
-        loader : 'babel',
-        //exclude: /node_modules/,
+        test: /\.jsx?/,
+        loader: 'babel',
+        // exclude: /node_modules/,
         query: {
           presets: ['es2015', 'react']
         }
@@ -35,6 +42,9 @@ module.exports = {
       }
     ], {
       manifest: 'app-entry'
-    })
+    }),
+    new CopyWebpackPlugin([
+        { from: 'src/static' }
+    ])
   ]
-};
+}
