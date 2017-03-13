@@ -1,6 +1,6 @@
 export default {
-  getItem(key) {
-    const data = localStorage.getItem(key)
+  getItem (key) {
+    const data = window.localStorage.getItem(key)
     if (data) {
       try {
         return JSON.parse(data)
@@ -10,7 +10,7 @@ export default {
     }
   },
 
-  setItem(key, val) {
-    localStorage.setItem(key, JSON.stringify(val))
+  setItem (key, val) {
+    window.localStorage.setItem(key, JSON.stringify(val))
   }
 }
