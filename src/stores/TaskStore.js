@@ -1,8 +1,8 @@
 import faApi from '../services/fa-api'
 import ObservableValue from './ObservableValue'
 
-class TaskStore {
-  constructor() {
+export default class TaskStore {
+  constructor () {
     this._tasks = {}
     this._acitveTasks = []
     this._activeTasksCallbacks = []
@@ -15,10 +15,10 @@ class TaskStore {
   }
 
   getActiveTasks () {
-    return this._acitveTasks;
+    return this._acitveTasks
   }
 
-  loadTask(taskUrl) {
+  loadTask (taskUrl) {
     const taskVector = this.getOrCreateTaskVector(taskUrl)
     if (taskVector.task) return this.storeTask(taskVector.task)
 
@@ -28,17 +28,17 @@ class TaskStore {
     })
   }
 
-  getTask(taskUrl) {
+  getTask (taskUrl) {
     const taskVector = this._tasks[taskUrl]
-    if(!taskVector) return null
+    if (!taskVector) return null
     return taskVector.task
   }
 
   getTaskOb (taskUrl) {
-    return this.getOrCreateTaskVector(taskUrl).observer;
+    return this.getOrCreateTaskVector(taskUrl).observer
   }
 
-  getOrCreateTaskVector(taskUrl) {
+  getOrCreateTaskVector (taskUrl) {
     let taskVector = this._tasks[taskUrl]
     if (!taskVector) {
       taskVector = this._tasks[taskUrl] = {
@@ -52,12 +52,12 @@ class TaskStore {
     return taskVector
   }
 
-  completeTask(taskUrl) {
+  completeTask (taskUrl) {
     faApi.completeTask(taskUrl)
       .then(() => this.loadActiveTasks(true))
   }
 
-  registerCallback(taskUrl, callback) {
+  registerCallback (taskUrl, callback) {
     if (taskUrl === 'activeTasks' || taskUrl === '/fatt/freeagent/tasks?view=active') {
       this._activeTasksCallbacks.push(callback)
       return
@@ -67,32 +67,29 @@ class TaskStore {
     taskVector.callbacks.push(callback)
   }
 
-  unregisterCallback(taskUrl, callback) {
+  unregisterCallback (taskUrl, callback) {
     if (taskUrl === 'activeTasks' || taskUrl === '/fatt/freeagent/tasks?view=active') {
-      this._activeTasksCallbacks = _activeTasksCallbacks.filter(c => c != callback)
+      this._activeTasksCallbacks = this._activeTasksCallbacks.filter(c => c !== callback)
       return
     }
 
     let taskVector = this._tasks[taskUrl]
     if (!taskVector) return
 
-    taskVector.callbacks = task.callbacks.filter(c => c != callback)
+    taskVector.callbacks = taskVector.callbacks.filter(c => c !== callback)
   }
 
-  storeActiveTasks(tasks) {
+  storeActiveTasks (tasks) {
     this._acitveTasks = tasks.map(x => x)
 
     tasks.forEach(p => this.storeTask(p))
     this._activeTasksCallbacks.forEach(cb => cb(tasks))
   }
 
-  storeTask(task) {
+  storeTask (task) {
     const taskVector = this.getOrCreateTaskVector(task.url)
     taskVector.observer.setValue(task)
     taskVector.task = task
     taskVector.callbacks.forEach(cb => cb(taskVector.task))
   }
 }
-
-module.exports = TaskStore
-export default TaskStore

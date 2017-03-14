@@ -7,6 +7,7 @@
   },
   "main": "server/app.js",
   "scripts": {
+    "dev": "webpack --watch & http-server dist-local -p 4849",
     "test": "mocha ./src-client/tests/.setup.js ./src-client/tests/**/*spec.jsx",
     "build": "webpack",
     "watch": "webpack --watch",

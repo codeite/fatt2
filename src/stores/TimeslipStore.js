@@ -1,64 +1,61 @@
 import faApi from '../services/fa-api'
 
-class TimeslipStore {
-  constructor() {
+export default class TimeslipStore {
+  constructor () {
     this._days = {}
-
   }
 
-  createTimeslips(taskUrl, hours, dates, comment) {
-     return faApi.createTimeslips(taskUrl, hours, dates, comment)
-       .then(() => {
+  createTimeslips (taskUrl, hours, dates, comment) {
+    return faApi.createTimeslips(taskUrl, hours, dates, comment)
+      .then(() => {
         const sorted = dates.map(x => x.format('YYYY-MM-DD')).sort()
 
         const from = sorted[0]
-        const to = sorted[sorted.length-1]
+        const to = sorted[sorted.length - 1]
         return this.loadRange(from, to)
       })
   }
 
-  loadRange(from, to) {
-    //console.log('load range', from, to)
+  loadRange (from, to) {
+    // console.log('load range', from, to)
     faApi.readTimeslips(from, to).then(ts => {
       this.storeTimeslips(ts.timeslips)
     })
   }
 
-  getDay(date) {
-    var day = this._days[date];
-
-    if(!day) return null;
-
+  getDay (date) {
+    var day = this._days[date]
+    if (!day) return null
     return this.dayToDay(day)
   }
 
-  dayToDay(day) {
+  dayToDay (day) {
     return {
       timeslips: [...day.timeslips.values()],
       total: day.total || 0
     }
   }
 
-  getOrCreateDay(date) {
-    if(date.format) date = date.format('YYYY-MM-DD')
+  getOrCreateDay (date) {
+    if (date.format) date = date.format('YYYY-MM-DD')
     let day = this._days[date]
     if (!day) day = this._days[date] = this.createDay(date)
     return day
   }
 
-  registerCallback(date, callback) {
+  registerCallback (date, callback) {
     let day = this.getOrCreateDay(date)
     day.callbacks.push(callback)
   }
 
-  unregisterCallback(date, callback) {
+  unregisterCallback (date, callback) {
     let day = this._days[date]
     if (!day) return
 
-    day.callbacks = day.callbacks.filter(c => c != callback)
+    day.callbacks = day.callbacks.filter(c => c !== callback)
   }
 
-  createDay(date) {
+  createDay (date) {
     return {
       date: date,
       callbacks: [],
@@ -66,17 +63,17 @@ class TimeslipStore {
     }
   }
 
-  deleteTimeslips(dates) {
+  deleteTimeslips (dates) {
     const timeslips = []
     dates.forEach(date => {
       const day = this.getOrCreateDay(date)
-      //console.log(date, [...day.timeslips.values()])
+      // console.log(date, [...day.timeslips.values()])
       Array.prototype.push.apply(timeslips, [...day.timeslips.values()])
     })
     return Promise.all(timeslips.map(this.deleteTimeslip.bind(this)))
   }
 
-  deleteTimeslip(timeslip) {
+  deleteTimeslip (timeslip) {
     return faApi.deleteTimeslip(timeslip.url)
       .then(() => {
         const day = this.getOrCreateDay(timeslip.dated_on)
@@ -87,11 +84,11 @@ class TimeslipStore {
       })
   }
 
-  storeTimeslip(timeslip) {
+  storeTimeslip (timeslip) {
     this.storeTimeslips([timeslip])
   }
 
-  storeTimeslips(timeslips) {
+  storeTimeslips (timeslips) {
     const callbacksToFire = new Set()
 
     timeslips.forEach(timeslip => {
@@ -108,6 +105,3 @@ class TimeslipStore {
   }
 
 }
-
-module.exports = TimeslipStore
-export default TimeslipStore

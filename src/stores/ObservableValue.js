@@ -1,30 +1,27 @@
 
-class ObservableValue {
-  constructor(name, initalValue) {
+export default class ObservableValue {
+  constructor (name, initalValue) {
     this.name = name
     this.listeners = new Set()
     this.value = initalValue
   }
 
-  getValue() {
-    return this.value;
+  getValue () {
+    return this.value
   }
 
-  setValue(newValue) {
+  setValue (newValue) {
     this.value = newValue
     this.listeners.forEach(f => f(newValue))
   }
 
-  addListener(callback) {
-    if (typeof(callback) === 'function') {
+  addListener (callback) {
+    if (typeof callback === 'function') {
       this.listeners.add(callback)
     }
   }
 
-  removeListener(callback) {
-     this.listeners.delete(callback)
+  removeListener (callback) {
+    this.listeners.delete(callback)
   }
 }
-
-module.exports = ObservableValue
-export default ObservableValue

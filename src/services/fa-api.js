@@ -2,13 +2,14 @@ import ls from './ls'
 import moment from 'moment'
 const callbacks = {}
 
-const {apiPrefix, loginUrl} = global.config
+const {apiPrefix, apiDomain, loginUrl, authorizeUrl} = global.config
 
 const faApi = {
-  getMe: () => getAndCache(apiPrefix + '/users/me', 'user'),
-  getCompany: () => getAndCache(apiPrefix + '/company', 'company'),
-  getActiveProjects: (reload) => getAndCache(apiPrefix + '/projects?view=active', 'projects', reload),
-  getActiveTasks: (reload) => getAndCache(apiPrefix + '/tasks?view=active', 'tasks', reload),
+  getMe: reload => getAndCache(apiPrefix + '/users/me', 'user', reload),
+  getCompany: reload => getAndCache(apiPrefix + '/company', 'company', reload),
+  getActiveProjects: reload => getAndCache(apiPrefix + '/projects?view=active', 'projects', reload),
+  getActiveTasks: reload => getAndCache(apiPrefix + '/tasks?view=active', 'tasks', reload),
+
   resolveProject: projectUrl => getAndCache(projectUrl, 'project'),
   resolveTask: taskUrl => getAndCache(taskUrl, 'task'),
   resolveContact: contactUrl => getAndCache(contactUrl, 'contact'),
@@ -18,6 +19,16 @@ const faApi = {
   deleteTimeslip,
   completeTask
 }
+
+Promise.all([faApi.getMe(false), faApi.getMe(true)])
+  .then(([meCached, meFresh]) => {
+    if (meCached.url !== meFresh.url) {
+      console.log('meCached.url !== meFresh.url', meCached.url, '!==', meFresh.url)
+      console.log('Cache invalid, clearing')
+
+      ls.clear(apiPrefix)
+    }
+  })
 
 function completeTask (taskUrl) {
   const body = JSON.stringify({
@@ -69,10 +80,24 @@ function createTimeslips (taskUrl, hours, dates, comment) {
         method: 'POST',
         body: body,
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'application/json'
         }
       })
     })
+}
+
+function handleFetchError (response) {
+  if (response.status === 401) {
+    window.location = loginUrl + '?redirect=' + window.location
+    return
+  }
+
+  if (response.status === 403) {
+    window.location = `${authorizeUrl}?domain=${apiDomain}&redirect=${window.location}`
+    return
+  }
+
+  throw new Error(response.status)
 }
 
 function readList (url, propertyName) {
@@ -84,12 +109,7 @@ function readList (url, propertyName) {
       window.fetch(url, {credentials: 'include'})
         .then(response => {
           if (!response.ok) {
-            if (response.status === 403) {
-              window.location = loginUrl + '?redirect=' + window.location
-              return
-            }
-
-            throw new Error(response.status)
+            return handleFetchError(response)
           }
           link = response.headers.get('link')
           return response.json()
@@ -138,7 +158,8 @@ function readLinks (link) {
 
 function getAndCache (url, transform, reload) {
   return new Promise((resolve, reject) => {
-    var value = ls.getItem(url)
+    const cacheKey = url
+    const value = ls.getItem(cacheKey)
 
     if (value && !reload) {
       // console.log('object: ', url, value)
@@ -159,10 +180,15 @@ function getAndCache (url, transform, reload) {
 
     // console.log('Requesting: ', url);
     window.fetch(url, {credentials: 'include'})
-      .then(response => response.json())
+      .then(response => {
+        if (!response.ok) {
+          return handleFetchError(response)
+        }
+        return response.json()
+      })
       .then(data => {
         // console.log('Success: ', url, data);
-        ls.setItem(url, data)
+        ls.setItem(cacheKey, data)
 
         const resolvers = callbacks[url]
 
@@ -186,5 +212,4 @@ function getAndCache (url, transform, reload) {
   })
 }
 
-module.exports = faApi
 export default faApi
