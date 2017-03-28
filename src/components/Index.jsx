@@ -62,7 +62,7 @@ const TaskOption = React.createClass({
   },
 
   render () {
-    return <option value={this.props.task.url}>{this.props.task.name} - {this.state.projectName} - "{this.state.displayName}"</option>
+    return <option value={this.props.task.url}>{this.state.displayName}</option>
   }
 })
 
