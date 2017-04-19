@@ -30,7 +30,9 @@ export default function Day (props) {
 
   if (date.isSame(moment(), 'day')) {
     className += ' today'
-  } else if (date.isBefore(moment())) {
+  }
+
+  if (date.isSameOrBefore(moment())) {
     className += (total < 8 ? ' short' : ' complete')
   }
 
