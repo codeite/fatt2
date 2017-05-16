@@ -8,7 +8,9 @@ export default class ProjectStore {
   }
 
   loadActiveProjects () {
-    faApi.getActiveProjects().then(projects => this.storeActiveProjects(projects))
+    faApi.getActiveProjects().then(projects => {
+      this.storeActiveProjects(projects)
+    })
   }
 
   loadProject (projectUrl) {

@@ -1,12 +1,12 @@
-import React from 'react';
-import {render} from 'react-dom';
+import React from 'react'
+import {render} from 'react-dom'
 
-import Fatt from './src/components/Index'
+import App from './src/components/App'
 
-class App extends React.Component {
+class EntryPoint extends React.Component {
   render () {
-    return <Fatt />
+    return <App />
   }
 }
 
-render(<App/>, document.getElementById('app'));
+render(<EntryPoint />, document.getElementById('app'))

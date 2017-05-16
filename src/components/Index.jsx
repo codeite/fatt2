@@ -1,6 +1,9 @@
 import React from 'react'
 import stores from '../stores'
 import moment from 'moment'
+import {
+  Link
+} from 'react-router-dom'
 
 import Month from './Month'
 import TaskManagerTaskContainer from './TaskManagerTaskContainer'
@@ -134,8 +137,20 @@ const AddTaskBar = React.createClass({
 
 const Fatt = React.createClass({
   getInitialState () {
-    return this.calcState(moment())
+    if (this.props.match) {
+      return this.calcState(moment(this.props.match.params.month))
+    } else {
+      return this.calcState(moment())
+    }
   },
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.match) {
+      const newState = this.calcState(moment(nextProps.match.params.month))
+      this.setState(newState)
+    }
+  },
+
   calcState (month) {
     month = moment(moment(month).format(isoMonthOnly))
     const firstDay = month.clone()
@@ -155,14 +170,7 @@ const Fatt = React.createClass({
       lastDay
     }
   },
-  move (months) {
-    const newState = this.calcState(this.state.month.clone().add(months, 'month'))
-    this.setState(newState)
 
-    const from = newState.firstDay.format(isoDateOnly)
-    const to = newState.lastDay.format(isoDateOnly)
-    stores.timeslipStore.loadRange(from, to)
-  },
   componentWillMount () {
     stores.taskStore.loadActiveTasks()
     stores.projectStore.loadActiveProjects()
@@ -171,12 +179,20 @@ const Fatt = React.createClass({
     const to = this.state.lastDay.format(isoDateOnly)
     stores.timeslipStore.loadRange(from, to)
   },
+
   render () {
+    const lastMonth = '/' + this.state.month.clone().add(-1, 'month').format('YYYY-MM')
+    const thisMonth = '/' + moment().format('YYYY-MM')
+    const nextMonth = '/' + this.state.month.clone().add(1, 'month').format('YYYY-MM')
+
     return <div>
       <div className='headerBar'>
-        <a onClick={() => this.move(-1)}>Prev</a>
-        <h1>{this.state.monthName}</h1>
-        <a onClick={() => this.move(1)}>Next</a>
+        <Link to={lastMonth} >Prev</Link>
+        <div>
+          <div style={{textAlign: 'center'}}><Link to={thisMonth}>This Month</Link></div>
+          <h1>{this.state.monthName}</h1>
+        </div>
+        <Link to={nextMonth} >Next</Link>
         <TaskManager />
         <AddTaskBar />
       </div>
