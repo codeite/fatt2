@@ -7,20 +7,21 @@ export default class DayContainer extends React.Component {
   constructor (props) {
     super(props)
     this.state = {loaded: false}
+    this.unregisterHandlers = []
   }
 
   componentWillMount () {
     const selectedOb = stores.selectedStore.getDayOb(this.props.date)
-    selectedOb.addListener(selected => {
+    this.unregisterHandlers.push(selectedOb.addListener(selected => {
       this.setState({selected: selected})
-    })
+    }))
     this.setState({selected: selectedOb.getValue()})
 
-    this.unregister = stores.timeslipStore.registerCallback(this.props.date, day => {
+    this.unregisterHandlers.push(stores.timeslipStore.registerCallback(this.props.date, day => {
       this.setState(Object.assign({
         loaded: true
       }, day))
-    })
+    }))
 
     const day = stores.timeslipStore.getDay(this.props.date)
     if (day) {
@@ -31,9 +32,11 @@ export default class DayContainer extends React.Component {
   }
 
   componentWillUnmount () {
-    if (typeof this.unregister === 'function') {
-      this.unregister()
-    }
+    this.unregisterHandlers.forEach(unregister => {
+      if (typeof unregister === 'function') {
+        unregister()
+      }
+    })
   }
 
   onSelectDay (e) {

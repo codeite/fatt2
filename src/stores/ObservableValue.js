@@ -19,6 +19,9 @@ export default class ObservableValue {
     if (typeof callback === 'function') {
       this.listeners.add(callback)
     }
+    return () => {
+      this.removeListener(callback)
+    }
   }
 
   removeListener (callback) {

@@ -1,18 +1,18 @@
 import React from 'react'
 
 const ObserveString = React.createClass({
-  getDefaultProps() { return {t: x => '' + x} },
-  getInitialState() { return {value: ''} },
-  listener(newValue) {
-    this.setState({value: newValue})
+  getDefaultProps () { return {t: x => '' + x} },
+  getInitialState () { return {value: ''} },
+  componentWillMount () {
+    this.removeListener = this.props.ob.addListener(newValue => this.setState({value: newValue}))
+    this.setState({value: this.props.ob.getValue() || 'loading'})
   },
-  componentWillMount() {
-    this.props.ob.addListener(v => this.listener(v))
-    this.setState({value:this.props.ob.getValue() || 'loading'})
+  componentWillUnmount () {
+    if (typeof this.removeListener === 'function') {
+      this.removeListener()
+    }
   },
-  componentWillUnmount() { this.props.ob.removeListener(this.listener) },
-
-  render() {
+  render () {
     return <span>{this.props.t(this.state.value)}</span>
   }
 })

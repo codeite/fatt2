@@ -54,14 +54,19 @@ const TaskOption = React.createClass({
   displayNameListener (displayName) { this.setState({displayName}) },
 
   componentWillMount () {
-    stores.projectStore.getProjectOb(this.props.task.project).addListener(this.projectListener)
-    stores.taskDisplayNameStore.getTaskDisplayNameOb(this.props.task.url).addListener(this.displayNameListener)
+    this.u1 = stores.projectStore.getProjectOb(this.props.task.project).addListener(this.projectListener)
+    this.u2 = stores.taskDisplayNameStore.getTaskDisplayNameOb(this.props.task.url).addListener(this.displayNameListener)
 
     const project = stores.projectStore.getProjectOb(this.props.task.project).getValue()
     this.setState({
       projectName: project && project.name,
       displayName: stores.taskDisplayNameStore.getTaskDisplayNameOb(this.props.task.url).getValue()
     })
+  },
+
+  componentWillUnmount () {
+    if (typeof this.u1 === 'function') this.u1()
+    if (typeof this.u2 === 'function') this.u2()
   },
 
   render () {
