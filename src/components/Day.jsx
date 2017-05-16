@@ -23,6 +23,7 @@ export default function Day (props) {
         key={timeslip.url}
         hours={timeslip.hours}
         isLocked={!!timeslip.billed_on_invoice}
+        comment={timeslip.comment}
         taskNameOb={taskNameOb}
         onDelete={e => { e.stopPropagation(); props.onDeleteTimeslip(timeslip) }} />
     })
