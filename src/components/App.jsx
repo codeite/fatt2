@@ -11,10 +11,10 @@ import Fatt from './Index'
 const App = () => (
   <HashRouter>
     <div>
-      <Route path='/'>
-        <Redirect to={`/${moment().format('YYYY-MM')}`} />
-      </Route>
-      <Route path='/:month?' component={Fatt} />
+      <Route path='/:month' component={Fatt} />
+      <Route exact path='/' render={() => {
+        return <Redirect to={`/${moment().format('YYYY-MM')}`} />
+      }} />
     </div>
   </HashRouter>
 )

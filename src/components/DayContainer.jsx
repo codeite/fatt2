@@ -16,7 +16,7 @@ export default class DayContainer extends React.Component {
     })
     this.setState({selected: selectedOb.getValue()})
 
-    stores.timeslipStore.registerCallback(this.props.date, day => {
+    this.unregister = stores.timeslipStore.registerCallback(this.props.date, day => {
       this.setState(Object.assign({
         loaded: true
       }, day))
@@ -27,6 +27,12 @@ export default class DayContainer extends React.Component {
       this.setState(Object.assign({
         loaded: true
       }, day))
+    }
+  }
+
+  componentWillUnmount () {
+    if (typeof this.unregister === 'function') {
+      this.unregister()
     }
   }
 

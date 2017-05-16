@@ -162,13 +162,14 @@ function getAndCache (url, transform, reload) {
     const value = ls.getItem(cacheKey)
 
     if (value && !reload) {
-      // console.log('object: ', url, value)
+      // console.log('using cached: ', url, value)
       let resolvedValue
       if (typeof transform === 'function') resolvedValue = transform(value)
       else if (transform) resolvedValue = value[transform]
       else resolvedValue = value
       return resolve(resolvedValue)
     }
+    // console.log('loading: ', url)
 
     const resolver = {resolve, reject, transform}
     if (Array.isArray(callbacks[url])) {

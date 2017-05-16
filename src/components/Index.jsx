@@ -147,7 +147,7 @@ const Fatt = React.createClass({
   componentWillReceiveProps (nextProps) {
     if (nextProps.match) {
       const newState = this.calcState(moment(nextProps.match.params.month))
-      this.setState(newState)
+      this.setState(newState, () => this.loadThisMonth())
     }
   },
 
@@ -174,7 +174,10 @@ const Fatt = React.createClass({
   componentWillMount () {
     stores.taskStore.loadActiveTasks()
     stores.projectStore.loadActiveProjects()
+    this.loadThisMonth()
+  },
 
+  loadThisMonth () {
     const from = this.state.firstDay.format(isoDateOnly)
     const to = this.state.lastDay.format(isoDateOnly)
     stores.timeslipStore.loadRange(from, to)

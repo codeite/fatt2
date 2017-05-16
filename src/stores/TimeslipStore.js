@@ -46,6 +46,9 @@ export default class TimeslipStore {
   registerCallback (date, callback) {
     let day = this.getOrCreateDay(date)
     day.callbacks.push(callback)
+    return () => {
+      this.unregisterCallback(date, callback)
+    }
   }
 
   unregisterCallback (date, callback) {
