@@ -143,7 +143,11 @@ const AddTaskBar = React.createClass({
 const Fatt = React.createClass({
   getInitialState () {
     if (this.props.match) {
-      return this.calcState(moment(this.props.match.params.month))
+      const selectedMonth = moment(this.props.match.params.month)
+      if (!selectedMonth.isValid) {
+        throw new Error('Invalid month: ' + this.props.match.params.month)
+      }
+      return this.calcState(selectedMonth)
     } else {
       return this.calcState(moment())
     }
@@ -151,7 +155,11 @@ const Fatt = React.createClass({
 
   componentWillReceiveProps (nextProps) {
     if (nextProps.match) {
-      const newState = this.calcState(moment(nextProps.match.params.month))
+      const selectedMonth = moment(this.props.match.params.month)
+      if (!selectedMonth.isValid) {
+        throw new Error('Invalid month: ' + this.props.match.params.month)
+      }
+      const newState = this.calcState(selectedMonth)
       this.setState(newState, () => this.loadThisMonth())
     }
   },
@@ -189,9 +197,9 @@ const Fatt = React.createClass({
   },
 
   render () {
-    const lastMonth = '/' + this.state.month.clone().add(-1, 'month').format('YYYY-MM')
-    const thisMonth = '/' + moment().format('YYYY-MM')
-    const nextMonth = '/' + this.state.month.clone().add(1, 'month').format('YYYY-MM')
+    const lastMonth = '/month/' + this.state.month.clone().add(-1, 'month').format('YYYY-MM')
+    const thisMonth = '/month/' + moment().format('YYYY-MM')
+    const nextMonth = '/month/' + this.state.month.clone().add(1, 'month').format('YYYY-MM')
 
     return <div>
       <div className='headerBar'>

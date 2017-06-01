@@ -151,3 +151,15 @@ label.day {
 a:not([href]) {
   cursor: pointer;
 }
+
+.Timesheet table {
+  border: 1px solid black;
+}
+
+.Timesheet tr:nth-child(even) td {
+  background: #EEEEEE;
+}
+
+.Timesheet td {
+  padding: 5px;
+}
