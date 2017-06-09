@@ -14,7 +14,9 @@ const Timeslip = ({taskNameOb, hours, isLocked, comment, onDelete}) => (<div cla
 </div>)
 
 const Comment = ({text}) => {
-  if (text) {
+  if ((text + '').toUpperCase() === 'WFH') {
+    return <div className='timeslip-delete glyphicon glyphicon-home' title={text} />
+  } else if (text) {
     return <div className='timeslip-delete glyphicon glyphicon-comment' title={text} />
   }
 
