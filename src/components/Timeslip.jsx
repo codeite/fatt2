@@ -1,7 +1,7 @@
 import React from 'react'
 import ObserveString from './ObserveString'
 
-const Timeslip = ({taskNameOb, hours, isLocked, comment, onDelete}) => (<div className='timeslip' >
+const Timeslip = ({taskNameOb, hours, isLocked, comment, onDelete, onSetCommnet}) => (<div className='timeslip' >
   {isLocked
     ? <div className='timeslip-delete glyphicon glyphicon-lock' />
     : <div className='timeslip-delete glyphicon glyphicon-remove-sign' onClick={onDelete} />
@@ -10,12 +10,24 @@ const Timeslip = ({taskNameOb, hours, isLocked, comment, onDelete}) => (<div cla
     <ObserveString ob={taskNameOb} />
 
   </div>
-  <div className='timeslip-hours' > <Comment text={comment} /> {parseInt(hours || 0, 10) }h</div>
+  <div className='timeslip-hours' > <Comment text={comment} onSetCommnet={onSetCommnet} /> {parseInt(hours || 0, 10) }h</div>
 </div>)
 
-const Comment = ({text}) => {
-  if ((text + '').toUpperCase() === 'WFH') {
+const Comment = ({text, onSetCommnet}) => {
+  const setComment = e => {
+    e.stopPropagation()
+    onSetCommnet(window.prompt('new text', text))
+  }
+
+  return <div className='glyphicon' onClick={setComment}><CommentIcon text={text} /></div>
+}
+
+const CommentIcon = ({text}) => {
+  const strText = ('' + text).toLowerCase()
+  if (strText.startsWith('wfh')) {
     return <div className='timeslip-delete glyphicon glyphicon-home' title={text} />
+  } else if (strText.startsWith('holiday')) {
+    return <div className='timeslip-delete glyphicon glyphicon-plane' title={text} />
   } else if (text) {
     return <div className='timeslip-delete glyphicon glyphicon-comment' title={text} />
   }

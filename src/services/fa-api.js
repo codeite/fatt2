@@ -17,6 +17,7 @@ const faApi = {
 
   createTimeslips,
   deleteTimeslip,
+  updateTimeslip,
   completeTask
 }
 
@@ -51,6 +52,18 @@ function deleteTimeslip (timeslipUrl) {
   return window.fetch(timeslipUrl, {
     credentials: 'include',
     method: 'DELETE'
+  })
+}
+
+function updateTimeslip (timeslip) {
+  console.log('updateTimeslip::timeslip:', timeslip)
+  return window.fetch(timeslip.url, {
+    method: 'PUT',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({timeslip})
   })
 }
 

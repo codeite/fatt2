@@ -25,6 +25,7 @@ export default function Day (props) {
         isLocked={!!timeslip.billed_on_invoice}
         comment={timeslip.comment}
         taskNameOb={taskNameOb}
+        onSetCommnet={text => props.onSetCommnet(timeslip, text)}
         onDelete={e => { e.stopPropagation(); props.onDeleteTimeslip(timeslip) }} />
     })
   }

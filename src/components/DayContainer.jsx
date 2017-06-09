@@ -53,6 +53,10 @@ export default class DayContainer extends React.Component {
     stores.timeslipStore.deleteTimeslip(timeslip)
   }
 
+  onSetCommnet (timeslip, newText) {
+    stores.timeslipStore.setTimeslipComment(timeslip, newText)
+  }
+
   render () {
     return <Day
       loaded={this.state.loaded}
@@ -61,6 +65,7 @@ export default class DayContainer extends React.Component {
       total={this.state.total}
       date={this.props.date}
       month={this.props.month}
+      onSetCommnet={this.onSetCommnet.bind(this)}
       onSelectDay={this.onSelectDay.bind(this)}
       onDeleteTimeslip={this.onDeleteTimeslip.bind(this)} />
   }

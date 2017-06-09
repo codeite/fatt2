@@ -87,6 +87,14 @@ export default class TimeslipStore {
       })
   }
 
+  setTimeslipComment (timeslip, newText) {
+    const clone = Object.assign({}, timeslip)
+    clone.comment = newText
+    faApi.updateTimeslip(clone).then(() => {
+      this.storeTimeslips([clone])
+    })
+  }
+
   storeTimeslip (timeslip) {
     this.storeTimeslips([timeslip])
   }
