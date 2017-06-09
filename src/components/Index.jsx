@@ -142,10 +142,10 @@ const AddTaskBar = React.createClass({
 
 const Fatt = React.createClass({
   getInitialState () {
-    if (this.props.match) {
-      const selectedMonth = moment(this.props.match.params.month)
+    if (this.props.month) {
+      const selectedMonth = moment(this.props.month)
       if (!selectedMonth.isValid) {
-        throw new Error('Invalid month: ' + this.props.match.params.month)
+        throw new Error('Invalid month: ' + this.props.month)
       }
       return this.calcState(selectedMonth)
     } else {
@@ -154,10 +154,10 @@ const Fatt = React.createClass({
   },
 
   componentWillReceiveProps (nextProps) {
-    if (nextProps.match) {
-      const selectedMonth = moment(this.props.match.params.month)
+    if (nextProps.month) {
+      const selectedMonth = moment(nextProps.month)
       if (!selectedMonth.isValid) {
-        throw new Error('Invalid month: ' + this.props.match.params.month)
+        throw new Error('Invalid month: ' + nextProps.month)
       }
       const newState = this.calcState(selectedMonth)
       this.setState(newState, () => this.loadThisMonth())

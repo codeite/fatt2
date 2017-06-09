@@ -12,7 +12,7 @@ import {Timesheet} from './Timesheet'
 const App = () => (
   <HashRouter>
     <div>
-      <Route exact path='/month/:month' component={Fatt} />
+      <Route exact path='/month/:month' render={props => <Fatt month={props.match.params.month} />} />
       <Route exact path='/' render={() => {
         return <Redirect to={`/month/${moment().format('YYYY-MM')}`} />
       }} />
