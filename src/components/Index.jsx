@@ -121,7 +121,12 @@ const AddTaskBar = React.createClass({
         </div>
         <div>
           <span>Hours: </span>
-          <select value={this.state.selectedHours} onChange={this.selectHours}><option>8.0</option><option>4.0</option></select>
+          <select value={this.state.selectedHours} onChange={this.selectHours}>
+            <option>8.0</option>
+            <option>6.0</option>
+            <option>4.0</option>
+            <option>2.0</option>
+          </select>
         </div>
         <div>
           <span>Comment: </span>
