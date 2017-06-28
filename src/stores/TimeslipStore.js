@@ -1,8 +1,9 @@
 import faApi from '../services/fa-api'
 
 export default class TimeslipStore {
-  constructor () {
+  constructor (taskStore) {
     this._days = {}
+    this.taskStore = taskStore
   }
 
   createTimeslips (taskUrl, hours, dates, comment) {
@@ -32,6 +33,7 @@ export default class TimeslipStore {
   dayToDay (day) {
     return {
       timeslips: [...day.timeslips.values()],
+      billableHours: day.billableHours || 0,
       total: day.total || 0
     }
   }
@@ -82,7 +84,11 @@ export default class TimeslipStore {
         const day = this.getOrCreateDay(timeslip.dated_on)
         if (day.timeslips.delete(timeslip.url)) {
           day.total = [...day.timeslips.values()].reduce((p, c) => p + parseInt(c.hours, 10), 0)
-          day.callbacks.forEach(cb => cb(this.dayToDay(day)))
+          return this.calcBillableHours(day)
+            .then(billableHours => {
+              day.billableHours = billableHours
+              day.callbacks.forEach(cb => cb(this.dayToDay(day)))
+            })
         }
       })
   }
@@ -111,8 +117,30 @@ export default class TimeslipStore {
 
     for (let day of callbacksToFire) {
       day.total = [...day.timeslips.values()].reduce((p, c) => p + parseInt(c.hours, 10), 0)
-      day.callbacks.forEach(cb => cb(this.dayToDay(day)))
+      this.calcBillableHours(day)
+        .then(billableHours => {
+          day.billableHours = billableHours
+          day.callbacks.forEach(cb => cb(this.dayToDay(day)))
+        })
     }
+  }
+
+  calcBillableHours (day) {
+    const timeslips = [...day.timeslips.values()]
+    const taskUrls = timeslips.map(ts => ts.task)
+    return Promise.all(taskUrls.map(url => this.taskStore.loadTask(url)))
+      .then(tasks => {
+        tasks = tasks.reduce((p, c) => { p[c.url] = c; return p }, {})
+
+        const total = timeslips.reduce((p, c) => {
+          return p + (tasks[c.task].is_billable ? parseInt(c.hours, 10) : 0)
+        }, 0)
+        return total
+      })
+      .then(result => {
+        console.log('result:', result)
+        return result
+      })
   }
 
 }

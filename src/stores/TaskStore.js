@@ -20,11 +20,15 @@ export default class TaskStore {
 
   loadTask (taskUrl) {
     const taskVector = this.getOrCreateTaskVector(taskUrl)
-    if (taskVector.task) return this.storeTask(taskVector.task)
+    if (taskVector.task) {
+      this.storeTask(taskVector.task)
+      return Promise.resolve(taskVector.task)
+    }
 
-    faApi.resolveTask(taskUrl).then(task => {
+    return faApi.resolveTask(taskUrl).then(task => {
       // console.log('Got task:', task)
       this.storeTask(task)
+      return task
     })
   }
 

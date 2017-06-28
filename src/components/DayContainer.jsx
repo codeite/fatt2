@@ -63,6 +63,7 @@ export default class DayContainer extends React.Component {
       selected={this.state.selected}
       timeslips={this.state.timeslips}
       total={this.state.total}
+      billableHours={this.state.billableHours}
       date={this.props.date}
       month={this.props.month}
       onSetCommnet={this.onSetCommnet.bind(this)}

@@ -13,10 +13,12 @@ export default function Day (props) {
   let total = 0
   let timeslipsHtml = ''
   let className = 'day'
+  let billableHours = 0
 
   if (props.loaded) {
     timeslips = props.timeslips
     total = props.total
+    billableHours = props.billableHours
     timeslipsHtml = timeslips.map(timeslip => {
       const taskNameOb = stores.taskDisplayNameStore.getTaskDisplayNameOb(timeslip.task)
       return <Timeslip
@@ -35,7 +37,14 @@ export default function Day (props) {
   }
 
   if (date.isSameOrBefore(moment())) {
-    className += (total < 8 ? ' short' : ' complete')
+    if (total < 8) {
+      className += ' short'
+    } else if (billableHours < 8) {
+      const percent = Math.round(Math.round(100 * billableHours / 2) / 4)
+      className += ' unbillable' + percent
+    } else {
+      className += ' complete'
+    }
   }
 
   if (!inMonth) className += ' text-muted'

@@ -4,14 +4,19 @@ import ProjectStore from './stores/ProjectStore'
 import SelectedStore from './stores/SelectedStore'
 import TaskDisplayNameStore from './stores/TaskDisplayNameStore'
 
-const stores = {
-  timeslipStore: new TimeslipStore(),
-  taskStore: new TaskStore(),
-  projectStore: new ProjectStore(),
-  selectedStore: new SelectedStore()
-}
+const taskStore = new TaskStore()
+const timeslipStore = new TimeslipStore(taskStore)
+const projectStore = new ProjectStore()
+const selectedStore = new SelectedStore()
+const taskDisplayNameStore = new TaskDisplayNameStore(taskStore)
 
-stores.taskDisplayNameStore = new TaskDisplayNameStore(stores.taskStore)
+const stores = {
+  timeslipStore,
+  taskStore,
+  projectStore,
+  selectedStore,
+  taskDisplayNameStore
+}
 
 module.exports = stores
 export default stores

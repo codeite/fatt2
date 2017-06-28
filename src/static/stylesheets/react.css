@@ -119,6 +119,27 @@ label.day {
   color: navy;
 }
 
+.day.unbillable0 {
+  background-color: #CAEAFF;
+  color: navy;
+}
+
+.day.unbillable25 {
+  background-color: #CAEAEF;
+  color: navy;
+}
+
+.day.unbillable50 {
+  background-color: #CAEADF;
+  color: navy;
+}
+
+.day.unbillable75 {
+  background-color: #CAEACE;
+  color: navy;
+}
+
+
 .day-total {
   display: flex;
 }
