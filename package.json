@@ -11,7 +11,8 @@
     "test": "mocha ./src-client/tests/.setup.js ./src-client/tests/**/*spec.jsx",
     "build": "webpack",
     "watch": "webpack --watch",
-    "publish": "rm -rf dist-live && ENV=live webpack && rsync -avz --delete ./dist-live/ sam@helium:~/webs/apps.codeite.net/static/fatt2"
+    "publish": "rm -rf dist-live && ENV=live webpack && rsync -avz --delete ./dist-live/ sam@helium:~/webs/apps.codeite.net/static/fatt2",
+    "deploy": "npm run publish"
   },
   "standard": {
     "globals": [
