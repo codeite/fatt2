@@ -118,16 +118,15 @@ function readList (url, propertyName) {
     next(url)
     let progress
     function next (url) {
-      let link
       window.fetch(url, {credentials: 'include'})
         .then(response => {
           if (!response.ok) {
             return handleFetchError(response)
           }
-          link = response.headers.get('link')
-          return response.json()
+          const link = response.headers.get('link')
+          return response.json().then(data => ({link, data}))
         })
-        .then(data => {
+        .then(({link, data}) => {
           if (progress) {
             progress[propertyName] = progress[propertyName].concat(data[propertyName])
           } else {
