@@ -18,7 +18,9 @@ const faApi = {
   createTimeslips,
   deleteTimeslip,
   updateTimeslip,
-  completeTask
+  completeTask,
+
+  resolve
 }
 
 Promise.all([faApi.getMe(false), faApi.getMe(true)])
@@ -166,6 +168,28 @@ function readLinks (link) {
   }, {})
 
   return res
+}
+
+function resolve (url) {
+  return window.fetch(url, {credentials: 'include'})
+    .then(response => {
+      if (!response.ok) {
+        return handleFetchError(response)
+      }
+      return response.json()
+    })
+    .then(data => {
+      const firstKey = Object.keys(data)[0]
+      return data[firstKey]
+    })
+    .catch(err => {
+      console.error('Fail: ', url)
+      console.error(err)
+
+      if (err === 401) {
+        window.location = '/fatt/faauth'
+      }
+    })
 }
 
 function getAndCache (url, transform, reload) {
