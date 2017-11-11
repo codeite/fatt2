@@ -56,17 +56,18 @@ export const Summary = React.createClass({
         const monthStats = timeslips.reduce((p, c) => {
           const date = moment(c.dated_on)
           if (!p[date.month()]) p[date.month()] = {worked: 0, unworked: 0}
-          const hours = ~~c.hours
+          const days = (~~c.hours) / (~~c.project.hours_per_day)
 
           if (c.task.is_billable) {
-            p[date.month()].worked += hours
+            p[date.month()].worked += days
           } else {
-            p[date.month()].unworked += hours
+            p[date.month()].unworked += days
           }
           return p
         }, {})
 
         const yearStats = {
+          weekendDays: 0,
           workedDays: 0,
           holidayDays: 0,
           untrackedDays: 0
@@ -76,26 +77,30 @@ export const Summary = React.createClass({
 
         while ('' + date.year() === '' + this.props.year) {
           const day = timeslipsByDate[date.format('YYYY-MM-DD')]
-          console.log('day:', day)
-          if (day) {
+          //console.log('day:', day)
+          if (date.isoWeekday() > 5) {
+            yearStats.weekendDays++
+          } else if (day) {
             const dayData = day.reduce((p, c) => {
               if (c.task.is_billable) {
-                p.w += ~~c.hours
+                p.w += ~~c.hours / ~~c.project.hours_per_day
               } else {
-                p.u += ~~c.hours
+                p.u += ~~c.hours / ~~c.project.hours_per_day
               }
               return p
             }, {w: 0, u: 0})
-            console.log('dayData:', dayData)
-            if (dayData.w >= 8) {
-              yearStats.workedDays++
-            } else if (dayData.w >= 4 && dayData.u >= 4) {
-              yearStats.workedDays += 0.5
-              yearStats.holidayDays += 0.5
-            } else if (dayData.u >= 8) {
-              yearStats.holidayDays++
-            } else {
+            const total = dayData.w + dayData.u
+
+            if (total < 1) {
+              console.log('dayData:', dayData)
+              console.log('day:', day)
               yearStats.untrackedDays++
+            } else if (total > 1) {
+              yearStats.workedDays += dayData.w / total
+              yearStats.holidayDays += dayData.u / total
+            } else {
+              yearStats.workedDays += dayData.w
+              yearStats.holidayDays += dayData.u
             }
           } else {
             yearStats.untrackedDays++
@@ -156,20 +161,20 @@ export const Summary = React.createClass({
 
         const res = (data || []).reduce((p, c) => {
           if (c.task.is_billable) {
-            p.paid += ~~c.hours
+            p.paid += ~~c.hours / ~~c.project.hours_per_day
           } else {
-            p.unpaid += ~~c.hours
+            p.unpaid += ~~c.hours / ~~c.project.hours_per_day
           }
           return p
         }, {paid: 0, unpaid: 0})
         const total = res.paid + res.unpaid
 
-        if (total < 8) {
+        if (total < 1) {
           className += ' short'
-        } else if (res.paid >= 8) {
+        } else if (res.paid >= 1) {
           className += ' complete'
         } else {
-          const worked = Math.floor((res.paid / total) * 4) * 25
+          const worked = Math.floor(res.paid * 4) * 25
           className += ' unbillable' + worked
         }
 
@@ -202,6 +207,14 @@ export const Summary = React.createClass({
           <tr>
             <td>Days untracked:</td>
             <td>{this.state.yearStats.untrackedDays}</td>
+          </tr>
+          <tr>
+            <td>Weekend days:</td>
+            <td>{this.state.yearStats.weekendDays}</td>
+          </tr>
+          <tr>
+            <td>Total:</td>
+            <td>{this.state.yearStats.workedDays + this.state.yearStats.holidayDays + this.state.yearStats.untrackedDays + this.state.yearStats.weekendDays}</td>
           </tr>
         </tbody>
       </table>}
@@ -238,9 +251,9 @@ export const Summary = React.createClass({
             return <tr key={mIndex} >
               <th>{month(mIndex).format('MMM')}</th>
               {this.state.monthStats[mIndex] && <td>
-                worked: {this.state.monthStats[mIndex].worked / 8}
+                worked: {this.state.monthStats[mIndex].worked }
                 {' '}
-                unworked: {this.state.monthStats[mIndex].unworked / 8}
+                unworked: {this.state.monthStats[mIndex].unworked }
               </td>
               }
             </tr>
