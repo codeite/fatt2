@@ -1,9 +1,10 @@
 import React from 'react'
+import createReactClass from 'create-react-class'
 import moment from 'moment'
 
 import faApi from '../../services/fa-api'
 
-export const Summary = React.createClass({
+export const Summary = createReactClass({
   getInitialState () {
     return {
       timeslipsByDate: {},
