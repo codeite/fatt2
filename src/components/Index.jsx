@@ -208,12 +208,14 @@ const Fatt = React.createClass({
 
     return <div>
       <div className='headerBar'>
-        <Link to={lastMonth} >Prev</Link>
-        <div>
-          <div style={{textAlign: 'center'}}><Link to={thisMonth}>This Month</Link></div>
-          <h1>{this.state.monthName}</h1>
+        <div className='monthNav'>
+          <Link to={lastMonth} >Prev</Link>
+          <div>
+            <div style={{textAlign: 'center'}}><Link to={thisMonth}>This Month</Link></div>
+            <h1>{this.state.monthName}</h1>
+          </div>
+          <Link to={nextMonth} >Next</Link>
         </div>
-        <Link to={nextMonth} >Next</Link>
         <TaskManager />
         <AddTaskBar />
       </div>

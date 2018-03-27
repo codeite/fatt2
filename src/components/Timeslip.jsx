@@ -25,11 +25,13 @@ const Comment = ({text, onSetCommnet}) => {
 const CommentIcon = ({text}) => {
   const strText = ('' + text).toLowerCase()
   if (strText.startsWith('wfh')) {
-    return <div className='timeslip-delete glyphicon glyphicon-home' title={text} />
+    return <div className='timeslip-edit glyphicon glyphicon-home' title={text} />
   } else if (strText.startsWith('holiday')) {
-    return <div className='timeslip-delete glyphicon glyphicon-plane' title={text} />
+    return <div className='timeslip-edit glyphicon glyphicon-plane' title={text} />
+  } else if (strText.startsWith('sick')) {
+    return <div className='timeslip-edit svgicon svgicon-sick' title={text} />
   } else if (text) {
-    return <div className='timeslip-delete glyphicon glyphicon-comment' title={text} />
+    return <div className='timeslip-edit glyphicon glyphicon-comment' title={text} />
   }
 
   return null

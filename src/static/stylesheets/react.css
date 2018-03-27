@@ -9,6 +9,13 @@
   border-bottom: 1px solid #bcbcff;
 }
 
+.monthNav {
+  padding: 8px;
+  display: flex;
+  justify-content: space-between;
+  min-width: 420px;
+}
+
 .addTaskBar {
   display: flex;
 }
@@ -185,4 +192,14 @@ a:not([href]) {
 
 .Timesheet td {
   padding: 5px;
+}
+
+.svgicon-sick {
+  background-image: url("../sick.svg");
+  width: 16px;
+  height: 16px;
+}
+
+.svgicon-sick::before {
+  content: ' '
 }
