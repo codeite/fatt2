@@ -2,6 +2,10 @@
   font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
+input[disabled] {
+  color: #888;
+}
+
 .headerBar {
   display: flex;
   background-color: #ececff;

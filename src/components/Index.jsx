@@ -113,6 +113,7 @@ const AddTaskBar = React.createClass({
     stores.selectedStore.clear()
   },
   render () {
+    const buttonsDisabled = this.state.selectedDates.length === 0
     return <div className='addTaskBar'>
       <div className='taskDetail'>
         <div>
@@ -133,9 +134,9 @@ const AddTaskBar = React.createClass({
           <input type='text' value={this.state.comment} onChange={e => this.setState({comment: e.target.value})} />
         </div>
         <div className='buttons'>
-          <input type='button' value='Add' onClick={this.addTimeSlips} />
-          <input type='button' value='Delete' onClick={this.delete} />
-          <input type='button' value='Clear' onClick={this.clear} />
+          <input type='button' value='Add' onClick={this.addTimeSlips} disabled={buttonsDisabled} />
+          <input type='button' value='Delete' onClick={this.delete} disabled={buttonsDisabled} />
+          <input type='button' value='Clear' onClick={this.clear} disabled={buttonsDisabled} />
         </div>
       </div>
       <div className='dates'>
