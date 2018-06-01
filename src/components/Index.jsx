@@ -221,6 +221,7 @@ const Fatt = React.createClass({
         <AddTaskBar />
       </div>
       <Month month={this.state.month} firstDay={this.state.firstDay} lastDay={this.state.lastDay} />
+      <a href={'#/timesheet/' + this.state.month.format('YYYY-MM')}>Timesheet</a>
     </div>
   }
 })
