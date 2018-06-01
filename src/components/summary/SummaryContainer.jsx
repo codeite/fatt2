@@ -104,6 +104,7 @@ const MonthStats = ({monthStats, year, months}) => {
             worked: {monthStats[mIndex].worked }
             {' '}
             unworked: {monthStats[mIndex].unworked }
+            ({' '}{(monthStats[mIndex].worked/monthStats[mIndex].available*100).toFixed(2)}%)
           </td>
           }
         </tr>
