@@ -87,15 +87,27 @@ export class Timesheet extends Component {
       start.add(1, 'day')
     }
 
+    const billableHours = day => {
+      return day.timeslips.reduce((acc, t) => acc + (t.hours * (t.taskObject.is_billable ? 1 : 0)), 0)
+    }
+
+    const rowClass = day => {
+      const weekday = day.date.weekday()
+      if(weekday > 0 && weekday <=5 && billableHours(day) < 8) {
+        return 'shortDay'
+      }
+      return null;
+    }
+
     return <div className='Timesheet' >
       Timesheet {this.state.month.format()}
       {this.props.match.params.month}
       <table>
         <tbody>
-          {days.map((day, i) => <tr key={i}>
+          {days.map((day, i) => <tr key={i} className={rowClass(day)}>
             <td>{day.date.format('dddd')}</td>
             <td>{day.date.format('DD MMM YYYY')}</td>
-            <td><Worked hours={day.timeslips.reduce((acc, t) => acc + (t.hours * (t.taskObject.is_billable ? 1 : 0)), 0)} /></td>
+            <td><Worked hours={billableHours(day)} /></td>
           </tr>)}
         </tbody>
       </table>

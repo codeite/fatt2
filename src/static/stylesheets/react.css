@@ -111,10 +111,6 @@ label.day {
   background-color: #f2dede;
 }
 
-.day.today.weekend {
-
-}
-
 .day.today {
   background-color: #f5f5f5;
   color: navy;
@@ -192,6 +188,10 @@ a:not([href]) {
 
 .Timesheet tr:nth-child(even) td {
   background: #EEEEEE;
+}
+
+.Timesheet tr.shortDay td {
+  background: red;
 }
 
 .Timesheet td {
