@@ -68,6 +68,15 @@ input[disabled] {
   margin-left: auto;
 }
 
+.timeslip-edit.none {
+  opacity: 0.1;
+  transition: opacity 0.5s;
+}
+
+.timeslip-edit.none:hover {
+  opacity: 1;
+}
+
 .day .day-timeslips {
   height: 3em;
   overflow-y: auto;

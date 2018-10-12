@@ -58,6 +58,13 @@ const CommentIcon = ({ text }) => {
     return (
       <div className="timeslip-edit glyphicon glyphicon-comment" title={text} />
     )
+  } else {
+    return (
+      <div
+        className="timeslip-edit none glyphicon glyphicon-comment"
+        title={text}
+      />
+    )
   }
 
   return null
