@@ -7,6 +7,7 @@ import {
 
 import Month from './Month'
 import TaskManagerTaskContainer from './TaskManagerTaskContainer'
+import Finance from './Finance';
 
 const isoMonthOnly = 'YYYY-MM'
 const isoDateOnly = 'YYYY-MM-DD'
@@ -222,6 +223,7 @@ const Fatt = React.createClass({
       </div>
       <Month month={this.state.month} firstDay={this.state.firstDay} lastDay={this.state.lastDay} />
       <a href={'#/timesheet/' + this.state.month.format('YYYY-MM')}>Timesheet</a>
+      <Finance month={this.state.month.format('YYYY-MM')} />
     </div>
   }
 })

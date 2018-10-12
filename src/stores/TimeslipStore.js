@@ -19,8 +19,9 @@ export default class TimeslipStore {
 
   loadRange (from, to) {
     // console.log('load range', from, to)
-    faApi.readTimeslips(from, to).then(ts => {
+    return faApi.readTimeslips(from, to).then(ts => {
       this.storeTimeslips(ts.timeslips)
+      return ts
     })
   }
 
