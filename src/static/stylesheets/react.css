@@ -1,5 +1,5 @@
 * {
-  font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 
 input[disabled] {
@@ -47,7 +47,7 @@ input[disabled] {
   padding: 1px 1em;
 }
 
-.headerBar .taskManager table{
+.headerBar .taskManager table {
   background-color: white;
   position: absolute;
   padding: 0.5em;
@@ -85,7 +85,7 @@ input[disabled] {
   width: calc(100% / 6);
   border: 1px solid lightgrey;
   margin: -1 -1 0 0;
-  padding: 3.5px
+  padding: 3.5px;
 }
 
 label.day {
@@ -100,11 +100,11 @@ label.day {
 .day.selected {
   border: 3px solid grey;
   z-index: 1;
-  padding: 1.5px
+  padding: 1.5px;
 }
 
 .day.complete {
-  background-color: #dff0d8
+  background-color: #dff0d8;
 }
 
 .day.short {
@@ -129,25 +129,24 @@ label.day {
 }
 
 .day.unbillable0 {
-  background-color: #CAEAFF;
+  background-color: #caeaff;
   color: navy;
 }
 
 .day.unbillable25 {
-  background-color: #CAEAEF;
+  background-color: #caeaef;
   color: navy;
 }
 
 .day.unbillable50 {
-  background-color: #CAEADF;
+  background-color: #caeadf;
   color: navy;
 }
 
 .day.unbillable75 {
-  background-color: #CAEACE;
+  background-color: #caeace;
   color: navy;
 }
-
 
 .day-total {
   display: flex;
@@ -168,8 +167,6 @@ label.day {
   justify-content: space-between;
 }
 
-
-
 .day-of-week-label {
   font-weight: bold;
 }
@@ -187,7 +184,7 @@ a:not([href]) {
 }
 
 .Timesheet tr:nth-child(even) td {
-  background: #EEEEEE;
+  background: #eeeeee;
 }
 
 .Timesheet tr.shortDay td {
@@ -199,11 +196,11 @@ a:not([href]) {
 }
 
 .svgicon-sick {
-  background-image: url("../sick.svg");
+  background-image: url('../sick.svg');
   width: 16px;
   height: 16px;
 }
 
 .svgicon-sick::before {
-  content: ' '
+  content: ' ';
 }

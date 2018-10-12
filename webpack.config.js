@@ -7,10 +7,7 @@ const outputDir = 'dist-' + env
 
 module.exports = {
   entry: {
-    app: [
-      `./src/config-${env}`,
-      './entry'
-    ]
+    app: [`./src/config-${env}`, './entry']
   },
   output: {
     path: path.resolve(__dirname, outputDir),
@@ -35,16 +32,17 @@ module.exports = {
     ]
   },
   plugins: [
-    new SplitByPathPlugin([
+    new SplitByPathPlugin(
+      [
+        {
+          name: 'vendor',
+          path: path.join(__dirname, 'node_modules')
+        }
+      ],
       {
-        name: 'vendor',
-        path: path.join(__dirname, 'node_modules')
+        manifest: 'app-entry'
       }
-    ], {
-      manifest: 'app-entry'
-    }),
-    new CopyWebpackPlugin([
-        { from: 'src/static' }
-    ])
+    ),
+    new CopyWebpackPlugin([{ from: 'src/static' }])
   ]
 }

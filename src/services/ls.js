@@ -1,5 +1,5 @@
 export default {
-  getItem (key) {
+  getItem(key) {
     const data = window.localStorage.getItem(key)
     if (data) {
       try {
@@ -10,11 +10,11 @@ export default {
     }
   },
 
-  setItem (key, val) {
+  setItem(key, val) {
     window.localStorage.setItem(key, JSON.stringify(val))
   },
 
-  clear (prefix) {
+  clear(prefix) {
     const matchingKeys = []
     for (var i = 0; i < window.localStorage.length; i++) {
       matchingKeys.push(window.localStorage.key(i))

@@ -2,18 +2,18 @@ import faApi from '../services/fa-api'
 import ObservableValue from './ObservableValue'
 
 export default class ProjectStore {
-  constructor () {
+  constructor() {
     this._projects = {}
     this._activeProjectsCallbacks = []
   }
 
-  loadActiveProjects () {
+  loadActiveProjects() {
     faApi.getActiveProjects().then(projects => {
       this.storeActiveProjects(projects)
     })
   }
 
-  loadProject (projectUrl) {
+  loadProject(projectUrl) {
     const projectVector = this.getOrCreateVector(projectUrl)
     if (projectVector.project) return this.storeProject(projectVector.project)
 
@@ -22,17 +22,17 @@ export default class ProjectStore {
     })
   }
 
-  getProject (projectUrl) {
+  getProject(projectUrl) {
     const projectVector = this._projects[projectUrl]
     if (!projectVector) return null
     return projectVector.project
   }
 
-  getProjectOb (projectUrl) {
+  getProjectOb(projectUrl) {
     return this.getOrCreateVector(projectUrl).observer
   }
 
-  getOrCreateVector (url) {
+  getOrCreateVector(url) {
     let projectVector = this._projects[url]
     if (!projectVector) {
       projectVector = this._projects[url] = {
@@ -46,8 +46,11 @@ export default class ProjectStore {
     return projectVector
   }
 
-  registerCallback (projectUrl, callback) {
-    if (projectUrl === 'activeProjects' || projectUrl === '/fatt/freeagent/projects?view=active') {
+  registerCallback(projectUrl, callback) {
+    if (
+      projectUrl === 'activeProjects' ||
+      projectUrl === '/fatt/freeagent/projects?view=active'
+    ) {
       this._activeProjectsCallbacks.push(callback)
       return
     }
@@ -56,24 +59,31 @@ export default class ProjectStore {
     projectVector.callbacks.push(callback)
   }
 
-  unregisterCallback (projectUrl, callback) {
-    if (projectUrl === 'activeProjects' || projectUrl === '/fatt/freeagent/projects?view=active') {
-      this._activeProjectsCallbacks = this._activeProjectsCallbacks.filter(c => c !== callback)
+  unregisterCallback(projectUrl, callback) {
+    if (
+      projectUrl === 'activeProjects' ||
+      projectUrl === '/fatt/freeagent/projects?view=active'
+    ) {
+      this._activeProjectsCallbacks = this._activeProjectsCallbacks.filter(
+        c => c !== callback
+      )
       return
     }
 
     let projectVector = this._projects[projectUrl]
     if (!projectVector) return
 
-    projectVector.callbacks = projectVector.callbacks.filter(c => c !== callback)
+    projectVector.callbacks = projectVector.callbacks.filter(
+      c => c !== callback
+    )
   }
 
-  storeActiveProjects (projects) {
+  storeActiveProjects(projects) {
     projects.forEach(p => this.storeProject(p))
     this._activeProjectsCallbacks.forEach(cb => cb(projects))
   }
 
-  storeProject (project) {
+  storeProject(project) {
     const projectVector = this.getOrCreateVector(project.url)
     projectVector.observer.setValue(project)
     projectVector.project = project

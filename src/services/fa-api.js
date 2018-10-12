@@ -2,18 +2,24 @@ import ls from './ls'
 import moment from 'moment'
 const callbacks = {}
 
-const {apiPrefix, apiDomain, loginUrl, authorizeUrl} = global.config
+const { apiPrefix, apiDomain, loginUrl, authorizeUrl } = global.config
 
 const faApi = {
   getMe: reload => getAndCache(apiPrefix + '/users/me', 'user', reload),
   getCompany: reload => getAndCache(apiPrefix + '/company', 'company', reload),
-  getActiveProjects: reload => getAndCache(apiPrefix + '/projects?view=active', 'projects', reload),
-  getActiveTasks: reload => getAndCache(apiPrefix + '/tasks?view=active', 'tasks', reload),
+  getActiveProjects: reload =>
+    getAndCache(apiPrefix + '/projects?view=active', 'projects', reload),
+  getActiveTasks: reload =>
+    getAndCache(apiPrefix + '/tasks?view=active', 'tasks', reload),
 
   resolveProject: projectUrl => getAndCache(projectUrl, 'project'),
   resolveTask: taskUrl => getAndCache(taskUrl, 'task'),
   resolveContact: contactUrl => getAndCache(contactUrl, 'contact'),
-  readTimeslips: (fromDate, toDate) => readList(apiPrefix + `/timeslips?from_date=${fromDate}&to_date=${toDate}`, 'timeslips'),
+  readTimeslips: (fromDate, toDate) =>
+    readList(
+      apiPrefix + `/timeslips?from_date=${fromDate}&to_date=${toDate}`,
+      'timeslips'
+    ),
 
   createTimeslips,
   deleteTimeslip,
@@ -23,17 +29,23 @@ const faApi = {
   resolve
 }
 
-Promise.all([faApi.getMe(false), faApi.getMe(true)])
-  .then(([meCached, meFresh]) => {
+Promise.all([faApi.getMe(false), faApi.getMe(true)]).then(
+  ([meCached, meFresh]) => {
     if (meCached.url !== meFresh.url) {
-      console.log('meCached.url !== meFresh.url', meCached.url, '!==', meFresh.url)
+      console.log(
+        'meCached.url !== meFresh.url',
+        meCached.url,
+        '!==',
+        meFresh.url
+      )
       console.log('Cache invalid, clearing')
 
       ls.clear(apiPrefix)
     }
-  })
+  }
+)
 
-function completeTask (taskUrl) {
+function completeTask(taskUrl) {
   const body = JSON.stringify({
     task: {
       status: 'Completed'
@@ -50,14 +62,14 @@ function completeTask (taskUrl) {
   })
 }
 
-function deleteTimeslip (timeslipUrl) {
+function deleteTimeslip(timeslipUrl) {
   return window.fetch(timeslipUrl, {
     credentials: 'include',
     method: 'DELETE'
   })
 }
 
-function updateTimeslip (timeslip) {
+function updateTimeslip(timeslip) {
   console.log('updateTimeslip::timeslip:', timeslip)
   return window.fetch(timeslip.url, {
     method: 'PUT',
@@ -65,13 +77,13 @@ function updateTimeslip (timeslip) {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({timeslip})
+    body: JSON.stringify({ timeslip })
   })
 }
 
-function createTimeslips (taskUrl, hours, dates, comment) {
-  return Promise.all([faApi.getMe(), faApi.resolveTask(taskUrl)])
-    .then(([me, task]) => {
+function createTimeslips(taskUrl, hours, dates, comment) {
+  return Promise.all([faApi.getMe(), faApi.resolveTask(taskUrl)]).then(
+    ([me, task]) => {
       const data = {
         timeslips: dates.map(date => {
           return {
@@ -98,39 +110,45 @@ function createTimeslips (taskUrl, hours, dates, comment) {
           'Content-Type': 'application/json'
         }
       })
-    })
+    }
+  )
 }
 
-function handleFetchError (response) {
+function handleFetchError(response) {
   if (response.status === 401) {
     window.location = loginUrl + '?redirect=' + window.location
     return
   }
 
   if (response.status === 403) {
-    window.location = `${authorizeUrl}?domain=${apiDomain}&redirect=${window.location}`
+    window.location = `${authorizeUrl}?domain=${apiDomain}&redirect=${
+      window.location
+    }`
     return
   }
 
   throw new Error(response.status)
 }
 
-function readList (url, propertyName) {
+function readList(url, propertyName) {
   return new Promise((resolve, reject) => {
     next(url)
     let progress
-    function next (url) {
-      window.fetch(url, {credentials: 'include'})
+    function next(url) {
+      window
+        .fetch(url, { credentials: 'include' })
         .then(response => {
           if (!response.ok) {
             return handleFetchError(response)
           }
           const link = response.headers.get('link')
-          return response.json().then(data => ({link, data}))
+          return response.json().then(data => ({ link, data }))
         })
-        .then(({link, data}) => {
+        .then(({ link, data }) => {
           if (progress) {
-            progress[propertyName] = progress[propertyName].concat(data[propertyName])
+            progress[propertyName] = progress[propertyName].concat(
+              data[propertyName]
+            )
           } else {
             progress = data
           }
@@ -152,7 +170,7 @@ function readList (url, propertyName) {
   })
 }
 
-function readLinks (link) {
+function readLinks(link) {
   if (!link || link === '') {
     return {}
   }
@@ -161,8 +179,14 @@ function readLinks (link) {
 
   var res = bits.reduce((result, bit) => {
     var leftRight = bit.split(';')
-    var linkVal = leftRight[0].trim().substr(1).slice(0, -1)
-    var linkName = leftRight[1].trim().substr(5).slice(0, -1)
+    var linkVal = leftRight[0]
+      .trim()
+      .substr(1)
+      .slice(0, -1)
+    var linkName = leftRight[1]
+      .trim()
+      .substr(5)
+      .slice(0, -1)
     result[linkName] = linkVal
     return result
   }, {})
@@ -170,8 +194,9 @@ function readLinks (link) {
   return res
 }
 
-function resolve (url) {
-  return window.fetch(url, {credentials: 'include'})
+function resolve(url) {
+  return window
+    .fetch(url, { credentials: 'include' })
     .then(response => {
       if (!response.ok) {
         return handleFetchError(response)
@@ -192,7 +217,7 @@ function resolve (url) {
     })
 }
 
-function getAndCache (url, transform, reload) {
+function getAndCache(url, transform, reload) {
   return new Promise((resolve, reject) => {
     const cacheKey = url
     const value = ls.getItem(cacheKey)
@@ -207,7 +232,7 @@ function getAndCache (url, transform, reload) {
     }
     // console.log('loading: ', url)
 
-    const resolver = {resolve, reject, transform}
+    const resolver = { resolve, reject, transform }
     if (Array.isArray(callbacks[url])) {
       callbacks[url].push(resolver)
       return
@@ -216,7 +241,8 @@ function getAndCache (url, transform, reload) {
     callbacks[url] = [resolver]
 
     // console.log('Requesting: ', url);
-    window.fetch(url, {credentials: 'include'})
+    window
+      .fetch(url, { credentials: 'include' })
       .then(response => {
         if (!response.ok) {
           return handleFetchError(response)
@@ -231,7 +257,8 @@ function getAndCache (url, transform, reload) {
 
         resolvers.forEach(resolver => {
           let resolvedData
-          if (typeof resolver.transform === 'function') resolvedData = transform(data)
+          if (typeof resolver.transform === 'function')
+            resolvedData = transform(data)
           else if (resolver.transform) resolvedData = data[transform]
           else resolvedData = data
           resolver.resolve(resolvedData)

@@ -1,10 +1,10 @@
-import React, {Component} from 'react'
+import React, { Component } from 'react'
 import moment from 'moment'
 
 import faApi from '../services/fa-api'
 
 export class Timesheet extends Component {
-  constructor (props) {
+  constructor(props) {
     super(props)
     const month = moment(props.match.params.month)
     this.state = {
@@ -13,38 +13,42 @@ export class Timesheet extends Component {
     }
   }
 
-  componentWillMount () {
-    this.loadThisMonth()
-      .then(({timeslips, projects, tasks}) => {
-        console.log('timeslips:', timeslips)
-        console.log('projects:', projects)
-        console.log('tasks:', tasks)
+  componentWillMount() {
+    this.loadThisMonth().then(({ timeslips, projects, tasks }) => {
+      console.log('timeslips:', timeslips)
+      console.log('projects:', projects)
+      console.log('tasks:', tasks)
 
-        const taskMap = tasks.reduce((p, c) => {
-          p[c.url] = c
+      const taskMap = tasks.reduce((p, c) => {
+        p[c.url] = c
+        return p
+      }, {})
+
+      const byDate = timeslips
+        .map(t => {
+          t.taskObject = taskMap[t.task]
+          return t
+        })
+        .reduce((p, c) => {
+          if (!p[c.dated_on]) p[c.dated_on] = []
+          p[c.dated_on].push(c)
           return p
         }, {})
+      console.log('byDate:', byDate)
 
-        const byDate = timeslips
-          .map(t => {
-            t.taskObject = taskMap[t.task]
-            return t
-          })
-          .reduce((p, c) => {
-            if (!p[c.dated_on]) p[c.dated_on] = []
-            p[c.dated_on].push(c)
-            return p
-          }, {})
-        console.log('byDate:', byDate)
-
-        this.setState({byDate})
-      })
+      this.setState({ byDate })
+    })
   }
 
-  loadThisMonth () {
-    const from = moment(this.state.month).startOf('month').format('YYYY-MM-DD')
-    const to = moment(this.state.month).endOf('month').format('YYYY-MM-DD')
-    return faApi.readTimeslips(from, to)
+  loadThisMonth() {
+    const from = moment(this.state.month)
+      .startOf('month')
+      .format('YYYY-MM-DD')
+    const to = moment(this.state.month)
+      .endOf('month')
+      .format('YYYY-MM-DD')
+    return faApi
+      .readTimeslips(from, to)
       .then(timeslips => timeslips.timeslips)
       .then(timeslips => {
         const projectLinks = new Set()
@@ -54,20 +58,20 @@ export class Timesheet extends Component {
           taskLinks.add(t.task)
         })
 
-        const projectPromises = [...projectLinks].map(url => faApi.resolveProject(url))
+        const projectPromises = [...projectLinks].map(url =>
+          faApi.resolveProject(url)
+        )
         const taskPromises = [...taskLinks].map(url => faApi.resolveTask(url))
 
-        return Promise.all(projectPromises)
-          .then(projects => {
-            return Promise.all(taskPromises)
-              .then(tasks => {
-                return {timeslips, projects, tasks}
-              })
+        return Promise.all(projectPromises).then(projects => {
+          return Promise.all(taskPromises).then(tasks => {
+            return { timeslips, projects, tasks }
           })
+        })
       })
   }
 
-  render () {
+  render() {
     const days = []
     const start = moment(this.state.month).startOf('month')
     const end = moment(this.state.month).endOf('month')
@@ -88,44 +92,58 @@ export class Timesheet extends Component {
     }
 
     const billableHours = day => {
-      return day.timeslips.reduce((acc, t) => acc + (t.hours * (t.taskObject.is_billable ? 1 : 0)), 0)
+      return day.timeslips.reduce(
+        (acc, t) => acc + t.hours * (t.taskObject.is_billable ? 1 : 0),
+        0
+      )
     }
 
     const rowClass = day => {
       const weekday = day.date.weekday()
-      if(weekday > 0 && weekday <=5 && billableHours(day) < 8) {
+      if (weekday > 0 && weekday <= 5 && billableHours(day) < 8) {
         return 'shortDay'
       }
-      return null;
+      return null
     }
 
-    return <div className='Timesheet' >
-      Timesheet {this.state.month.format()}
-      {this.props.match.params.month}
-      <table>
-        <tbody>
-          {days.map((day, i) => <tr key={i} className={rowClass(day)}>
-            <td>{day.date.format('dddd')}</td>
-            <td>{day.date.format('DD MMM YYYY')}</td>
-            <td><Worked hours={billableHours(day)} /></td>
-          </tr>)}
-        </tbody>
-      </table>
-    </div>
+    return (
+      <div className="Timesheet">
+        Timesheet {this.state.month.format()}
+        {this.props.match.params.month}
+        <table>
+          <tbody>
+            {days.map((day, i) => (
+              <tr key={i} className={rowClass(day)}>
+                <td>{day.date.format('dddd')}</td>
+                <td>{day.date.format('DD MMM YYYY')}</td>
+                <td>
+                  <Worked hours={billableHours(day)} />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    )
   }
 }
 
-function Worked ({hours}) {
+function Worked({ hours }) {
   return <span>{toDaysDecimal(hours)}</span>
 }
 
 const toDaysDecimal = hours => {
   switch (hours) {
-    case 0: return '0.00'
-    case 2: return '0.25'
-    case 4: return '0.50'
-    case 6: return '0.75'
-    case 8: return '1.00'
+    case 0:
+      return '0.00'
+    case 2:
+      return '0.25'
+    case 4:
+      return '0.50'
+    case 6:
+      return '0.75'
+    case 8:
+      return '1.00'
     default:
       return (hours / 8).toFixed(2)
   }
@@ -133,11 +151,16 @@ const toDaysDecimal = hours => {
 
 const toDays = hours => {
   switch (hours) {
-    case 0: return 'Not worked'
-    case 2: return '1/4 day'
-    case 4: return '1/2 day'
-    case 6: return '3/4 day'
-    case 8: return '1 day'
+    case 0:
+      return 'Not worked'
+    case 2:
+      return '1/4 day'
+    case 4:
+      return '1/2 day'
+    case 6:
+      return '3/4 day'
+    case 8:
+      return '1 day'
     default:
       return `${hours} hours`
   }

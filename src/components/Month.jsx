@@ -5,13 +5,15 @@ import WeekDays from './WeekDays'
 import Week from './Week'
 const isoDateOnly = 'YYYY-MM-DD'
 
-
-export default function Month (props) {
+export default function Month(props) {
   const month = moment(props.month)
   const weekStarting = moment(props.firstDay)
 
   const weeks = []
-  const lastDay = month.clone().add(1, 'month').add(-1, 'day')
+  const lastDay = month
+    .clone()
+    .add(1, 'month')
+    .add(-1, 'day')
 
   for (;;) {
     let weekStartingDate = weekStarting.format(isoDateOnly)
@@ -20,8 +22,12 @@ export default function Month (props) {
     if (weekStarting > lastDay) break
   }
 
-  return <div className='month'>
-    <WeekDays start={weekStarting.clone()} key='lables' />
-    {weeks.map(week => <Week month={month} start={week} key={week} />)}
-  </div>
+  return (
+    <div className="month">
+      <WeekDays start={weekStarting.clone()} key="lables" />
+      {weeks.map(week => (
+        <Week month={month} start={week} key={week} />
+      ))}
+    </div>
+  )
 }

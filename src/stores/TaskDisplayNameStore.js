@@ -2,19 +2,19 @@ import ObservableValue from './ObservableValue'
 import ls from '../services/ls'
 
 export default class TaskDisplayNameStore {
-  constructor (taskStore) {
+  constructor(taskStore) {
     this.taskStore = taskStore
     this._observables = []
   }
 
-  getTaskDisplayName (taskUrl) {
+  getTaskDisplayName(taskUrl) {
     let observable = this._observables[taskUrl]
 
     if (observable) return observable.getValue()
     return ''
   }
 
-  getTaskDisplayNameOb (taskUrl) {
+  getTaskDisplayNameOb(taskUrl) {
     let observable = this._observables[taskUrl]
     if (observable) return observable
 
@@ -25,12 +25,15 @@ export default class TaskDisplayNameStore {
     const task = taskOb.getValue()
     const taskName = task && task.name
 
-    observable = this._observables[taskUrl] = new ObservableValue('tdns'+taskUrl, displayNames[taskUrl] || taskName)
+    observable = this._observables[taskUrl] = new ObservableValue(
+      'tdns' + taskUrl,
+      displayNames[taskUrl] || taskName
+    )
     observable.taskOb = taskOb
     return observable
   }
 
-  setTask (task) {
+  setTask(task) {
     const displayNames = ls.getItem('displayNames') || {}
     if (!displayNames[task.url]) {
       const observable = this.getTaskDisplayNameOb(task.url)
@@ -38,7 +41,7 @@ export default class TaskDisplayNameStore {
     }
   }
 
-  setDisplayName (taskUrl, newDisplayName) {
+  setDisplayName(taskUrl, newDisplayName) {
     const displayNames = ls.getItem('displayNames') || {}
     const observable = this.getTaskDisplayNameOb(taskUrl)
 
